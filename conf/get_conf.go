@@ -6,6 +6,11 @@ import (
 	"log"
 )
 
+const ConfigPath = "./conf/conf.yaml"
+
+//定义全局配置
+var Config = GetConf()
+
 //定义全局配置变量
 type Conf struct {
 	Redis struct {
@@ -20,7 +25,7 @@ type Conf struct {
 		Database string `yaml:"database"`
 	}
 	Jwt struct {
-		TokenExpireDuration int    `yaml:"tokenexpireduration"` //小时为单位
+		TokenExpireDuration int    `yaml:"token_expire_duration"` //小时为单位
 		Secret              string `yaml:"secret"`
 	}
 	Server struct {
@@ -31,7 +36,7 @@ type Conf struct {
 //获取配置
 func GetConf() *Conf {
 	var c = Conf{}
-	yamlFile, err := ioutil.ReadFile("./conf/conf.yaml")
+	yamlFile, err := ioutil.ReadFile(ConfigPath)
 	if err != nil {
 		log.Println(err.Error())
 	}
@@ -42,6 +47,3 @@ func GetConf() *Conf {
 	}
 	return &c
 }
-
-//定义全局配置
-var Config = GetConf()

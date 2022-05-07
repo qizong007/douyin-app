@@ -16,34 +16,32 @@ func InitDB() {
 
 var (
 	//Redis相关全局变量
-	CTX     = context.Background()
-	RedisDB = redis.NewClient(&redis.Options{
+	RedisCtx = context.Background()
+	RedisDB  = redis.NewClient(&redis.Options{
 		Addr:     conf.Config.Redis.Addr,
-		Password: conf.Config.Redis.Password, // no password set
-		DB:       conf.Config.Redis.DB,       // use default DB
+		Password: conf.Config.Redis.Password,
+		DB:       conf.Config.Redis.DB,
 	})
-
 	//gorm变量
 	DB *gorm.DB
 )
 
 func InitRedis() {
-	_, err := RedisDB.Ping(CTX).Result()
+	_, err := RedisDB.Ping(RedisCtx).Result()
 	if err != nil {
 		panic(err)
 	}
 }
 
 func InitMySQL() {
-
 	dsn := conf.Config.MYSQL.Username + ":" +
 		conf.Config.MYSQL.Password + "@tcp(" +
 		conf.Config.MYSQL.Addr + ")/" +
-		conf.Config.MYSQL.Database + "?charset=utf8mb4&parseTime=True&loc=Local"
+		conf.Config.MYSQL.Database +
+		"?charset=utf8mb4&parseTime=True&loc=Local"
 
 	var err error
 	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{}) //这里用短变量声明会有歧义
-
 	if err != nil {
 		panic(err)
 	}

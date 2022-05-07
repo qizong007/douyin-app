@@ -8,8 +8,8 @@ mysql:
   addr: "127.0.0.1:3306"
   database: "douyin_app"
 jwt:
-  tokenexpireduration: 240 #hour
-  secrect: "天王盖地虎" #token服务端秘钥
+  token_expire_duration: 240    #hour
+  secrect: "天王盖地虎"           #token服务端秘钥
 server:
   port: "8080"
 
