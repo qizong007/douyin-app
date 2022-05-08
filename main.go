@@ -9,6 +9,7 @@ import (
 
 func main() {
 	repository.InitDB()
+	conf.InitConf("./conf/conf.yaml")
 
 	r := gin.Default()
 	handler.Register(r)

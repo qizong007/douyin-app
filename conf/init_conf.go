@@ -6,10 +6,12 @@ import (
 	"log"
 )
 
-const ConfigPath = "./conf/conf.yaml"
-
 //定义全局配置
-var Config = GetConf()
+var Config *Conf
+
+func InitConf(path string) {
+	Config = LoadConfig(path)
+}
 
 //定义全局配置变量
 type Conf struct {
@@ -34,7 +36,7 @@ type Conf struct {
 }
 
 //获取配置
-func GetConf() *Conf {
+func LoadConfig(ConfigPath string) *Conf {
 	var c = Conf{}
 	yamlFile, err := ioutil.ReadFile(ConfigPath)
 	if err != nil {
