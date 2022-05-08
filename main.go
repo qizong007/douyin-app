@@ -7,9 +7,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+const (
+	ConfPath = "./conf/conf.yaml"
+)
+
 func main() {
+	conf.InitConf(ConfPath)
 	repository.InitDB()
-	conf.InitConf("./conf/conf.yaml")
 
 	r := gin.Default()
 	handler.Register(r)
