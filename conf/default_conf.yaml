@@ -1,0 +1,16 @@
+redis:
+  addr:     "localhost:6379"
+  password:  ''  # no password set
+  db:       0   #use default DB
+mysql:
+  username: "root"
+  password: "111111"
+  addr: "127.0.0.1:3306"
+  database: "douyin_app"
+jwt:
+  token_expire_duration: 240    #hour
+  secrect: "天王盖地虎"           #token服务端秘钥
+server:
+  port: ":8080"
+
+#默认配置信息格式模板,使用前先改为本机配置
