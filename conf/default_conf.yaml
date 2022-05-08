@@ -11,6 +11,6 @@ jwt:
   token_expire_duration: 240    #hour
   secrect: "天王盖地虎"           #token服务端秘钥
 server:
-  port: "8080"
+  port: ":8080"
 
 #配置信息格式模板,使用前先把 default_conf.yaml 改为 conf.yaml
