@@ -16,17 +16,20 @@ func InitDB() {
 
 var (
 	//Redis相关全局变量
-	RedisCtx = context.Background()
-	RedisDB  = redis.NewClient(&redis.Options{
-		Addr:     conf.Config.Redis.Addr,
-		Password: conf.Config.Redis.Password,
-		DB:       conf.Config.Redis.DB,
-	})
-	//gorm变量
+	RedisCtx context.Context
+	RedisDB  *redis.Client
+
+	//gorm全局变量
 	DB *gorm.DB
 )
 
 func InitRedis() {
+	RedisCtx = context.Background()
+	RedisDB = redis.NewClient(&redis.Options{
+		Addr:     conf.Config.Redis.Addr,
+		Password: conf.Config.Redis.Password,
+		DB:       conf.Config.Redis.DB,
+	})
 	_, err := RedisDB.Ping(RedisCtx).Result()
 	if err != nil {
 		panic(err)
