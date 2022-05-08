@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	ConfPath = "./conf/conf.yaml"
+	ConfPath = "./conf/default_conf.yaml"
 )
 
 func main() {
