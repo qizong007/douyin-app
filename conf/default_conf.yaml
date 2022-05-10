@@ -9,7 +9,7 @@ mysql:
   database: "douyin_app"
 jwt:
   token_expire_duration: 240    #hour
-  secrect: "天王盖地虎"           #token服务端秘钥
+  secret: "天王盖地虎"           #token服务端秘钥
 server:
   port: ":8080"
 
