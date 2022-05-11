@@ -12,7 +12,7 @@ func Register(c *gin.Context, username string, password string) {
 	if exist := repository.ExistUserByName(username); exist {
 		resp := util.HttpResponse{
 			StatusCode: util.ParamError,
-			StatusMsg:  "Username is already in use",
+			StatusMsg:  "username is already in use",
 			ReturnVal: map[string]interface{}{
 				"user_id": 0,
 				"token":   "",
