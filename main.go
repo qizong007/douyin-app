@@ -20,5 +20,6 @@ func main() {
 
 	r := gin.Default()
 	handler.Register(r)
+	handler.Login(r)
 	r.Run(conf.Config.Server.Port) // listen and serve on 0.0.0.0:8080
 }
