@@ -1,11 +1,21 @@
 package util
 
 const (
-	Success    = 0
-	ParamError = 10000
+	Success = iota
+
+	ErrorAuth
+	NoAuth
+
+	InternalServerError
+	ParamError
 )
 
 var ErrCode2Msg = map[int]string{
-	Success:    "success",
-	ParamError: "something wrong with param...",
+	Success: "success",
+
+	ErrorAuth: "the token is expired or invalid",
+	NoAuth:    "token not received",
+
+	InternalServerError: "internal server error",
+	ParamError:          "something wrong with param...",
 }
