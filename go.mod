@@ -3,7 +3,8 @@ module douyin-app
 go 1.16
 
 require (
-	github.com/bwmarrin/snowflake v0.3.0 // indirect
+	github.com/bwmarrin/snowflake v0.3.0
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-playground/validator/v10 v10.11.0 // indirect
 	github.com/go-redis/redis/v8 v8.11.5
