@@ -2,6 +2,7 @@ package repository
 
 import (
 	"douyin-app/util"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"time"
 )
@@ -32,7 +33,7 @@ func ExistUserByName(username string) bool {
 	return false
 }
 
-func CreateUserInfo(username string, password string) (ID int, userId int64, err error) {
+func CreateUserInfo(username string, password string) (ID int, UserId int64, err error) {
 	user := UserInfo{
 		UserId:   util.GenerateId(),
 		Username: username,
@@ -44,4 +45,17 @@ func CreateUserInfo(username string, password string) (ID int, userId int64, err
 		return 0, 0, err
 	}
 	return user.ID, user.UserId, nil
+}
+
+//通过username获取用户信息
+//并验证用户的密码是否正确
+func VerifyPassword(username string, password string) (ID int, UserId int64, ok bool) {
+	var user UserInfo
+	DB.Where("username = ?", username).First(&user)
+
+	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	if err != nil {
+		return 0, 0, false
+	}
+	return user.ID, user.UserId, true
 }
