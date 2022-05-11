@@ -4,6 +4,7 @@ import (
 	"douyin-app/conf"
 	"douyin-app/handler"
 	"douyin-app/repository"
+	"douyin-app/util"
 	"github.com/gin-gonic/gin"
 )
 
@@ -14,6 +15,7 @@ const (
 func main() {
 	conf.InitConf(ConfPath)
 	repository.InitDB()
+	util.InitIdGenerator()
 
 	r := gin.Default()
 	handler.Register(r)
