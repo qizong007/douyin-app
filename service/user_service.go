@@ -7,6 +7,47 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+func Login(c *gin.Context, username string, password string) {
+	//若用户名不存在
+	if exist := repository.ExistUserByName(username); !exist {
+		resp := util.HttpResponse{
+			StatusCode: util.ParamError,
+			StatusMsg:  "username is not exist",
+			ReturnVal: map[string]interface{}{
+				"user_id": 0,
+				"token":   "",
+			},
+		}
+		util.MakeResponse(c, &resp)
+		return
+	}
+
+	Id, UserId, ok := repository.VerifyPassword(username, password)
+	if !ok {
+		resp := util.HttpResponse{
+			StatusCode: util.ErrorAuth,
+			StatusMsg:  "password is wrong",
+			ReturnVal: map[string]interface{}{
+				"user_id": 0,
+				"token":   "",
+			},
+		}
+		util.MakeResponse(c, &resp)
+		return
+	}
+	//生成token
+	token, _ := util.GenerateToken(Id, UserId)
+	resp := util.HttpResponse{
+		StatusCode: util.Success,
+		ReturnVal: map[string]interface{}{
+			"user_id": UserId,
+			"token":   token,
+		},
+	}
+	util.MakeResponse(c, &resp)
+	return
+}
+
 func Register(c *gin.Context, username string, password string) {
 	//判断用户名是否在使用
 	if exist := repository.ExistUserByName(username); exist {
