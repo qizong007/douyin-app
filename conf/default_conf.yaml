@@ -1,5 +1,3 @@
-#默认配置信息格式模板,使用前先改为本机配置
-
 redis:
   addr:     "localhost:6379"
   password:  ''  # no password set
@@ -19,4 +17,6 @@ oss:
   bucket_name: "dyin-app"
   bucket_domain: "dyin-app.oss-cn-hangzhou.aliyuncs.com"
 server:
-  port: ":8080"
+  port: ":8866"
+
+#默认配置信息格式模板,使用前先改为本机配置

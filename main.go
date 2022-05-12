@@ -16,6 +16,8 @@ func main() {
 	conf.InitConf(ConfPath)
 	repository.InitDB()
 	util.InitIdGenerator()
+	util.InitJWTVal()
+	util.InitValidate()
 
 	r := gin.Default()
 	handler.Register(r)
