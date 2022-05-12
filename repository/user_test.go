@@ -19,7 +19,7 @@ func TestUserRepo(t *testing.T) {
 	conf.InitConf(confPath)
 	initMySQL()
 	initRepository()
-	util.InitIdGenerator()
+	util.InitUtil()
 
 	ctx := context.Background()
 	userId := util.GenerateId()

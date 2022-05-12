@@ -4,6 +4,7 @@ import (
 	"douyin-app/conf"
 	"errors"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
 	"time"
 )
 
@@ -21,19 +22,16 @@ func initJWTVal() {
 }
 
 // MyClaims自定义声明结构体并内嵌jwt.StandardClaims
-// 这里额外记录两个字段
 type MyClaims struct {
-	Id     int64 //用户唯一自增主键ID
 	UserId int64 //表示用户业务ID
 	jwt.StandardClaims
 }
 
 //生成token,传入ID,userId,生成JWTString和err
-func GenerateToken(Id int64, UserId int64) (string, error) {
+func GenerateToken(UserId int64) (string, error) {
 	// 创建一个自己的声明/请求
 	c := MyClaims{
-		Id,
-		UserId, // 自定义字段
+		UserId,
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(tokenExpireDuration).Unix(), // 过期时间
 			Issuer:    "douyin-app",                               // 签发人
@@ -62,4 +60,23 @@ func ParseToken(tokenString string) (*MyClaims, error) {
 	}
 	//token无效，返回错误
 	return nil, errors.New("invalid token")
+}
+
+//对请求进行token检查
+//errCode 可能为Success 0, NoAuth 2 ,ErrorAuth 3
+func CheckToken(c *gin.Context) (userId int64, errCode int) {
+
+	//获取query中的token
+	token := c.Request.URL.Query().Get("token")
+	if token == "" {
+		return 0, NoAuth
+	}
+
+	//我们使用之前定义好的解析JWT的函数来解析它
+	claim, err := ParseToken(token)
+	if err != nil {
+		return 0, ErrorAuth
+	}
+
+	return claim.UserId, Success
 }
