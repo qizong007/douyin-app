@@ -3,8 +3,10 @@ package handler
 import (
 	"douyin-app/service"
 	"douyin-app/util"
+	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"gorm.io/gorm"
 	"strings"
 )
 
@@ -27,7 +29,25 @@ func RegisterHandler(c *gin.Context) {
 		util.MakeResponse(c, &resp)
 		return
 	}
-	service.Register(c, Req.Username, Req.Password)
+	userId, token, err := service.Register(c, req.Username, req.Password)
+	resp.ReturnVal = map[string]interface{}{
+		"user_id": userId,
+		"token":   token,
+	}
+	if err != nil {
+		if errors.Is(err, util.ErrUserExisted) { //用户已存在
+			resp.StatusCode = util.UserExisted
+			util.MakeResponse(c, &resp)
+			return
+		}
+
+		resp.StatusCode = util.InternalServerError
+		util.MakeResponse(c, &resp)
+		return
+	}
+	resp.StatusCode = util.Success
+	util.MakeResponse(c, &resp)
+	return
 }
 
 func LoginHandler(c *gin.Context) {
@@ -40,7 +60,7 @@ func LoginHandler(c *gin.Context) {
 	req.Username = strings.TrimSpace(req.Username)
 
 	validate := validator.New() // 创建验证器
-	err := validate.Struct(Req) // 执行验证
+	err := validate.Struct(req) // 执行验证
 	if err != nil {
 		resp.StatusCode = util.ParamError
 		util.MakeResponse(c, &resp)
