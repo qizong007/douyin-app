@@ -5,87 +5,68 @@ import (
 	"douyin-app/util"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
+	"log"
 )
 
-func Register(c *gin.Context, username string, password string) {
-	//判断用户名是否在使用
-	if exist := repository.ExistUserByName(username); exist {
-		resp := util.HttpResponse{
-			StatusCode: util.ParamError,
-			StatusMsg:  "username is already in use",
-			ReturnVal: map[string]interface{}{
-				"user_id": 0,
-				"token":   "",
-			},
-		}
-		util.MakeResponse(c, &resp)
+func Register(c *gin.Context, username string, password string) (userId int64, token string, err error) {
+
+	//判断用户名是否已被使用
+	_, err = repository.GetUserRepository().FindByUsername(c, username)
+	if err == nil { //用户名已被使用
+		err = util.ErrUserExist
+		log.Println(err)
+		return
+	} else if err != gorm.ErrRecordNotFound { //出现了其他错误
+		log.Println(err)
 		return
 	}
-	hashPassword, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+
+	hashPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		log.Println(err)
+		return
+	}
 
 	//创建用户实例,存入注册信息
-	Id, userId, err := repository.CreateUserInfo(username, string(hashPassword))
+	user := repository.User{
+		UserId:   util.GenerateId(),
+		Username: username,
+		Password: string(hashPassword),
+	}
+	err = repository.GetUserRepository().Create(c, &user)
 	if err != nil {
-		resp := util.HttpResponse{
-			StatusCode: util.InternalServerError,
-			ReturnVal: map[string]interface{}{
-				"user_id": 0,
-				"token":   "",
-			},
-		}
-		util.MakeResponse(c, &resp)
+		log.Println(err)
 		return
 	}
+
 	//生成token
-	token, _ := util.GenerateToken(Id, userId)
-	resp := util.HttpResponse{
-		StatusCode: util.Success,
-		ReturnVal: map[string]interface{}{
-			"user_id": userId,
-			"token":   token,
-		},
+	if token, err = util.GenerateToken(user.UserId); err != nil {
+		log.Println(err)
+		return
 	}
-	util.MakeResponse(c, &resp)
-	return
+	return user.UserId, token, nil
 }
 
-func Login(c *gin.Context, username string, password string) {
-	//若用户名不存在
-	if exist := repository.ExistUserByName(username); !exist {
-		resp := util.HttpResponse{
-			StatusCode: util.ParamError,
-			StatusMsg:  "username is not exist",
-			ReturnVal: map[string]interface{}{
-				"user_id": 0,
-				"token":   "",
-			},
-		}
-		util.MakeResponse(c, &resp)
+func Login(c *gin.Context, username string, password string) (userId int64, token string, err error) {
+
+	//通过用户名查找信息
+	user, err := repository.GetUserRepository().FindByUsername(c, username)
+	if err != nil {
+		log.Println(err)
 		return
 	}
 
-	Id, UserId, ok := repository.VerifyPassword(username, password)
-	if !ok {
-		resp := util.HttpResponse{
-			StatusCode: util.ErrorAuth,
-			StatusMsg:  "password is wrong",
-			ReturnVal: map[string]interface{}{
-				"user_id": 0,
-				"token":   "",
-			},
-		}
-		util.MakeResponse(c, &resp)
+	if err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
+		log.Println(err)
+		err = util.ErrWrongPassword
 		return
 	}
+
 	//生成token
-	token, _ := util.GenerateToken(Id, UserId)
-	resp := util.HttpResponse{
-		StatusCode: util.Success,
-		ReturnVal: map[string]interface{}{
-			"user_id": UserId,
-			"token":   token,
-		},
+	if token, err = util.GenerateToken(user.UserId); err != nil {
+		log.Println(err)
+		return
 	}
-	util.MakeResponse(c, &resp)
-	return
+	return user.UserId, token, nil
 }
