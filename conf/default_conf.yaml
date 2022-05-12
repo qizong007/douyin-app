@@ -1,3 +1,5 @@
+#默认配置信息格式模板,使用前先改为本机配置
+
 redis:
   addr:     "localhost:6379"
   password:  ''  # no password set
@@ -10,7 +12,11 @@ mysql:
 jwt:
   token_expire_duration: 240    #hour
   secrect: "天王盖地虎"           #token服务端秘钥
+oss:
+  endpoint: "oss-cn-hangzhou.aliyuncs.com"
+  access_key_id: ""
+  access_key_secret: ""
+  bucket_name: "dyin-app"
+  bucket_domain: "dyin-app.oss-cn-hangzhou.aliyuncs.com"
 server:
   port: ":8080"
-
-#默认配置信息格式模板,使用前先改为本机配置

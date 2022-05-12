@@ -3,6 +3,7 @@ module douyin-app
 go 1.16
 
 require (
+	github.com/aliyun/aliyun-oss-go-sdk v2.2.2+incompatible // indirect
 	github.com/bwmarrin/snowflake v0.3.0 // indirect
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-playground/validator/v10 v10.11.0 // indirect
@@ -14,6 +15,7 @@ require (
 	github.com/ugorji/go v1.2.7 // indirect
 	golang.org/x/crypto v0.0.0-20220507011949-2cf3adece122 // indirect
 	golang.org/x/sys v0.0.0-20220503163025-988cb79eb6c6 // indirect
+	golang.org/x/time v0.0.0-20220411224347-583f2d630306 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0
 	gorm.io/driver/mysql v1.3.3
