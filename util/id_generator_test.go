@@ -18,8 +18,8 @@ func TestGenerateId(t *testing.T) {
 	assert.Equal(t, int64(1), sequenceIdStepMask&id2)
 	assert.Equal(t, true, (id1>>sequenceIdStep) == (id2>>sequenceIdStep))
 	for i := 0; i < 100000; i++ {
-		id1 := GenerateId()
-		id2 := GenerateId()
+		id1 = GenerateId()
+		id2 = GenerateId()
 		//检验递增性
 		assert.Equal(t, true, id1 < id2)
 		//检验是否越界

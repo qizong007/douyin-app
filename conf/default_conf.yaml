@@ -9,7 +9,13 @@ mysql:
   database: "douyin_app"
 jwt:
   token_expire_duration: 240    #hour
-  secret: "天王盖地虎"           #token服务端秘钥
+  secrect: "天王盖地虎"           #token服务端秘钥
+oss:
+  endpoint: "oss-cn-hangzhou.aliyuncs.com"
+  access_key_id: ""
+  access_key_secret: ""
+  bucket_name: "dyin-app"
+  bucket_domain: "dyin-app.oss-cn-hangzhou.aliyuncs.com"
 server:
   port: ":8866"
 
