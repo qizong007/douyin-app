@@ -4,7 +4,6 @@ import (
 	"douyin-app/conf"
 	"errors"
 	"github.com/dgrijalva/jwt-go"
-	"github.com/gin-gonic/gin"
 	"time"
 )
 
@@ -44,7 +43,7 @@ func GenerateToken(UserId int64) (string, error) {
 	return token.SignedString(mySecret)
 }
 
-// 解析tokenString，返回一个包含信息的用户声明
+// 解析token，返回一个包含信息的用户声明
 func ParseToken(tokenString string) (*MyClaims, error) {
 	// 通过(tokenString,请求结构,返回秘钥的一个回调函数)这三个参数,返回一个token结构体
 	token, err := jwt.ParseWithClaims(tokenString, &MyClaims{}, func(token *jwt.Token) (i interface{}, err error) {
@@ -62,22 +61,18 @@ func ParseToken(tokenString string) (*MyClaims, error) {
 	return nil, errors.New("invalid token")
 }
 
-//对请求进行token检查
-//token存在会返回解析出的userId
-//errCode 可能为Success 0, NoAuth 2 ,ErrorAuth 3
-func CheckToken(c *gin.Context) (userId int64, errCode int) {
+//对token进行检查
+//token有效会返回解析出的userId,否则会返回错误
+func CheckToken(token string) (userId int64, err error) {
 
-	//获取query中的token
-	token := c.Request.URL.Query().Get("token")
 	if token == "" {
-		return 0, NoAuth
+		return 0, ErrNoAuth
 	}
 
-	//我们使用之前定义好的解析JWT的函数来解析它
 	claim, err := ParseToken(token)
 	if err != nil {
-		return 0, WrongAuth
+		return 0, ErrWrongAuth
 	}
 
-	return claim.UserId, Success
+	return claim.UserId, nil
 }
