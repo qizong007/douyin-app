@@ -27,10 +27,10 @@ type MyClaims struct {
 }
 
 //生成token,传入ID,userId,生成JWTString和err
-func GenerateToken(UserId int64) (string, error) {
+func GenerateToken(userId int64) (string, error) {
 	// 创建一个自己的声明/请求
 	c := MyClaims{
-		UserId,
+		userId,
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(tokenExpireDuration).Unix(), // 过期时间
 			Issuer:    "douyin-app",                               // 签发人

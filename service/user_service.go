@@ -14,7 +14,7 @@ func Register(c *gin.Context, username string, password string) (userId int64, t
 	//判断用户名是否已被使用
 	_, err = repository.GetUserRepository().FindByUsername(c, username)
 	if err == nil { //用户名已被使用
-		err = util.ErrUserExist
+		err = util.ErrUserExisted
 		log.Println(err)
 		return
 	} else if err != gorm.ErrRecordNotFound { //出现了其他错误

@@ -8,7 +8,7 @@ const (
 	WrongAuth
 	NoAuth
 
-	UserExist
+	UserExisted
 	UserNotExist
 	WrongPassword
 
@@ -22,7 +22,7 @@ var ErrCode2Msg = map[int]string{
 	WrongAuth: "the token is expired or invalid",
 	NoAuth:    "token not received",
 
-	UserExist:     "user already exists",
+	UserExisted:   "user already exists",
 	UserNotExist:  "username is not exist",
 	WrongPassword: "password is wrong",
 
@@ -33,6 +33,6 @@ var ErrCode2Msg = map[int]string{
 var (
 	ErrWrongAuth     = errors.New(ErrCode2Msg[WrongAuth])
 	ErrNoAuth        = errors.New(ErrCode2Msg[NoAuth])
-	ErrUserExist     = errors.New(ErrCode2Msg[UserExist])
+	ErrUserExisted   = errors.New(ErrCode2Msg[UserExisted])
 	ErrWrongPassword = errors.New(ErrCode2Msg[WrongPassword])
 )
