@@ -1,61 +1,54 @@
 package repository
 
 import (
-	"douyin-app/util"
-	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm"
-	"time"
+	"context"
 )
 
 type User struct {
-	Id         int64  `json:"id"`      //逻辑id,自增
-	UserId     int64  `json:"user_id"` //业务id
+	Id         int64  `json:"id" gorm:"primaryKey"`
+	UserId     int64  `json:"user_id" gorm:"index"`
 	Username   string `json:"username"`
 	Password   string `json:"password"`
-	CreateTime int64  `json:"create_time"`
-	ModifyTime int64  `json:"modify_time"`
+	CreateTime int64  `json:"create_time" gorm:"autoCreateTime"`
+	ModifyTime int64  `json:"modify_time" gorm:"autoUpdateTime"`
 	DeleteTime int64  `json:"delete_time"`
 }
 
-//在创建前设置时间
-func (user *User) BeforeCreate(*gorm.DB) error {
-	user.CreateTime = time.Now().Unix()
-	return nil
+type IUserRepository interface {
+	Create(context.Context, *User) error
+	Update(context.Context, *User) error
+	DeleteByUserId(context.Context, int64) error
+	FindByUserId(context.Context, int64) (*User, error)
+	FindByUserIds(context.Context, []int64) ([]*User, error)
+	FindByUsername(context.Context, string) (*User, error)
 }
 
-//判断用户名在数据库中是否存在,存在则返回true
-func ExistUserByName(username string) bool {
-	var user User
-	err := DB.Select("id").Where("username = ?", username).First(&user).Error
-	if err == gorm.ErrRecordNotFound {
-		return false
-	}
-	return true
+type UserRepository struct{}
+
+func (r *UserRepository) Create(ctx context.Context, user *User) error {
+	return DB.WithContext(ctx).Create(&user).Error
 }
 
-func CreateUserInfo(username string, password string) (ID int64, UserId int64, err error) {
-	user := User{
-		UserId:   util.GenerateId(),
-		Username: username,
-		Password: password,
-	}
-
-	err = DB.Create(&user).Error
-	if err != nil {
-		return 0, 0, err
-	}
-	return user.Id, user.UserId, nil
+func (r *UserRepository) Update(ctx context.Context, user *User) error {
+	return DB.WithContext(ctx).Where("delete_time = 0").Updates(&user).Error
 }
 
-//通过username获取用户信息
-//并验证用户的密码是否正确
-func VerifyPassword(username string, password string) (ID int64, UserId int64, ok bool) {
-	var user User
-	DB.Where("username = ?", username).First(&user)
+func (r *UserRepository) DeleteByUserId(ctx context.Context, userId int64) error {
+	return DB.WithContext(ctx).Where("user_id = ? and delete_time = 0", userId).Delete(User{}).Error
+}
 
-	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
-	if err != nil {
-		return 0, 0, false
-	}
-	return user.Id, user.UserId, true
+func (r *UserRepository) FindByUserId(ctx context.Context, userId int64) (user *User, err error) {
+	err = DB.WithContext(ctx).Where("user_id = ? and delete_time = 0", userId).First(&user).Error
+	return user, err
+}
+
+func (r *UserRepository) FindByUserIds(ctx context.Context, userIdList []int64) ([]*User, error) {
+	users := make([]*User, 0)
+	err := DB.WithContext(ctx).Where("user_id in (?) and delete_time = 0", userIdList).Find(&users).Error
+	return users, err
+}
+
+func (r *UserRepository) FindByUsername(ctx context.Context, username string) (user *User, err error) {
+	err = DB.WithContext(ctx).Where("username = ? and delete_time = 0", username).First(&user).Error
+	return user, err
 }

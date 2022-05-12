@@ -10,8 +10,9 @@ import (
 )
 
 func InitDB() {
-	InitMySQL()
-	InitRedis()
+	initMySQL()
+	initRedis()
+	initRepository()
 }
 
 var (
@@ -23,7 +24,7 @@ var (
 	DB *gorm.DB
 )
 
-func InitRedis() {
+func initRedis() {
 	RedisCtx = context.Background()
 	RedisDB = redis.NewClient(&redis.Options{
 		Addr:     conf.Config.Redis.Addr,
@@ -36,7 +37,7 @@ func InitRedis() {
 	}
 }
 
-func InitMySQL() {
+func initMySQL() {
 	dsn := conf.Config.MYSQL.Username + ":" +
 		conf.Config.MYSQL.Password + "@tcp(" +
 		conf.Config.MYSQL.Addr + ")/" +
@@ -56,4 +57,16 @@ func InitMySQL() {
 	if err != nil {
 		log.Panicln(err)
 	}
+}
+
+var (
+	userRepo IUserRepository
+)
+
+func initRepository() {
+	userRepo = &UserRepository{}
+}
+
+func GetUserRepository() IUserRepository {
+	return userRepo
 }
