@@ -51,7 +51,7 @@ func InitMySQL() {
 
 	//绑定结构体
 	err = DB.AutoMigrate(
-		UserInfo{},
+		User{},
 	)
 	if err != nil {
 		log.Panicln(err)

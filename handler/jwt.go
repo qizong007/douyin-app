@@ -7,7 +7,7 @@ import (
 
 //进行token检查
 //errCode 可能为Success 0, NoAuth 2 ,ErrorAuth 3
-func JWTHandler(c *gin.Context) (ID int, userId int64, errCode int) {
+func JWTHandler(c *gin.Context) (Id int64, userId int64, errCode int) {
 
 	//获取query中的token
 	token := c.Request.URL.Query().Get("token")
@@ -21,5 +21,5 @@ func JWTHandler(c *gin.Context) (ID int, userId int64, errCode int) {
 		return 0, 0, util.ErrorAuth
 	}
 
-	return claim.ID, claim.UserId, util.Success
+	return claim.Id, claim.UserId, util.Success
 }

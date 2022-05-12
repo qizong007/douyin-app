@@ -23,16 +23,16 @@ func InitJWTVal() {
 // MyClaims自定义声明结构体并内嵌jwt.StandardClaims
 // 这里额外记录两个字段
 type MyClaims struct {
-	ID     int   //用户唯一自增主键ID
+	Id     int64 //用户唯一自增主键ID
 	UserId int64 //表示用户业务ID
 	jwt.StandardClaims
 }
 
 //生成token,传入ID,userId,生成JWTString和err
-func GenerateToken(ID int, UserId int64) (string, error) {
+func GenerateToken(Id int64, UserId int64) (string, error) {
 	// 创建一个自己的声明/请求
 	c := MyClaims{
-		ID,
+		Id,
 		UserId, // 自定义字段
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(tokenExpireDuration).Unix(), // 过期时间

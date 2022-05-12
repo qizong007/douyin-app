@@ -24,7 +24,7 @@ func Register(c *gin.Context, username string, password string) {
 	hashPassword, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 
 	//创建用户实例,存入注册信息
-	ID, userId, err := repository.CreateUserInfo(username, string(hashPassword))
+	Id, userId, err := repository.CreateUserInfo(username, string(hashPassword))
 	if err != nil {
 		resp := util.HttpResponse{
 			StatusCode: util.InternalServerError,
@@ -37,7 +37,7 @@ func Register(c *gin.Context, username string, password string) {
 		return
 	}
 	//生成token
-	token, _ := util.GenerateToken(ID, userId)
+	token, _ := util.GenerateToken(Id, userId)
 	resp := util.HttpResponse{
 		StatusCode: util.Success,
 		ReturnVal: map[string]interface{}{

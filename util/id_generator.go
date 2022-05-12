@@ -26,7 +26,7 @@ func InitIdGenerator() {
 }
 
 // +-----------------------------------------+
-// |  41 Bit Timestamp |  12 Bit Sequence ID |
+// |  41 Bit Timestamp |  12 Bit Sequence Id |
 // +-----------------------------------------+
 
 func GenerateId() int64 {
@@ -34,7 +34,7 @@ func GenerateId() int64 {
 	origId := idGenerator.node.Generate()
 	// 自制ID
 	id := int64(0)
-	id |= origId.Step()                   // 12 Bit Sequence ID
+	id |= origId.Step()                   // 12 Bit Sequence Id
 	id |= origId.Time() << sequenceIdStep // 41 Bit Timestamp
 	return id
 }

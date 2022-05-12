@@ -15,6 +15,6 @@ func TestJWT(t *testing.T) {
 		c, err := ParseToken(token)
 		assert.Equal(t, nil, err)
 		assert.Equal(t, c.UserId, int64(1<<50))
-		assert.Equal(t, c.ID, 1)
+		assert.Equal(t, c.Id, 1)
 	}
 }

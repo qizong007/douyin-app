@@ -21,7 +21,7 @@ func Login(c *gin.Context, username string, password string) {
 		return
 	}
 
-	ID, UserId, ok := repository.VerifyPassword(username, password)
+	Id, UserId, ok := repository.VerifyPassword(username, password)
 	if !ok {
 		resp := util.HttpResponse{
 			StatusCode: util.ErrorAuth,
@@ -35,7 +35,7 @@ func Login(c *gin.Context, username string, password string) {
 		return
 	}
 	//生成token
-	token, _ := util.GenerateToken(ID, UserId)
+	token, _ := util.GenerateToken(Id, UserId)
 	resp := util.HttpResponse{
 		StatusCode: util.Success,
 		ReturnVal: map[string]interface{}{
