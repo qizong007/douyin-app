@@ -76,7 +76,7 @@ func CheckToken(c *gin.Context) (userId int64, errCode int) {
 	//我们使用之前定义好的解析JWT的函数来解析它
 	claim, err := ParseToken(token)
 	if err != nil {
-		return 0, AuthWrong
+		return 0, WrongAuth
 	}
 
 	return claim.UserId, Success

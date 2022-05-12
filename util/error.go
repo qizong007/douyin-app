@@ -5,7 +5,7 @@ import "errors"
 const (
 	Success = iota
 
-	AuthWrong
+	WrongAuth
 	NoAuth
 
 	UserExist
@@ -19,7 +19,7 @@ const (
 var ErrCode2Msg = map[int]string{
 	Success: "success",
 
-	AuthWrong: "the token is expired or invalid",
+	WrongAuth: "the token is expired or invalid",
 	NoAuth:    "token not received",
 
 	UserExist:     "user already exists",
@@ -31,5 +31,8 @@ var ErrCode2Msg = map[int]string{
 }
 
 var (
-	ErrUserExist = errors.New(ErrCode2Msg[UserExist])
+	ErrWrongAuth     = errors.New(ErrCode2Msg[WrongAuth])
+	ErrNoAuth        = errors.New(ErrCode2Msg[NoAuth])
+	ErrUserExist     = errors.New(ErrCode2Msg[UserExist])
+	ErrWrongPassword = errors.New(ErrCode2Msg[WrongPassword])
 )
