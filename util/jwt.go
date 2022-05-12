@@ -15,7 +15,7 @@ var (
 	tokenExpireDuration time.Duration
 )
 
-func InitJWTVal() {
+func initJWTVal() {
 	tokenExpireDuration = time.Duration(int64(conf.Config.Jwt.TokenExpireDuration) * int64(time.Hour))
 	mySecret = []byte(conf.Config.Jwt.Secret)
 }

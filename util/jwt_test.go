@@ -8,7 +8,7 @@ import (
 
 func TestJWT(t *testing.T) {
 	conf.InitConf("./conf/default_conf.yaml")
-	InitJWTVal()
+	initJWTVal()
 	for i := 0; i < 10000; i++ {
 		token, err := GenerateToken(1, 1<<50)
 		assert.Equal(t, nil, err)
