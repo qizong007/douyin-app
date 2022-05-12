@@ -8,14 +8,14 @@ import (
 	"strings"
 )
 
-type Req struct {
+type RegisterReq struct {
 	Username string `validate:"required,max=32"`
 	Password string `validate:"required,min=6,max=32"`
 }
 
 func RegisterHandler(c *gin.Context) {
 	//解析,处理参数
-	var req Req
+	var req RegisterReq
 	var resp util.HttpResponse
 	req.Username = c.Query("username")
 	req.Password = c.Query("password")
@@ -31,13 +31,13 @@ func RegisterHandler(c *gin.Context) {
 }
 
 func LoginHandler(c *gin.Context) {
-	//解析,处理参数
-	var Req Req
+	//登录请求和注册请求是一样的
+	var req RegisterReq
 	var resp util.HttpResponse
-	Req.Username = c.Query("username")
-	Req.Password = c.Query("password")
+	req.Username = c.Query("username")
+	req.Password = c.Query("password")
 	//去username首尾空格
-	Req.Username = strings.TrimSpace(Req.Username)
+	req.Username = strings.TrimSpace(req.Username)
 
 	validate := validator.New() // 创建验证器
 	err := validate.Struct(Req) // 执行验证
@@ -47,7 +47,7 @@ func LoginHandler(c *gin.Context) {
 		return
 	}
 
-	userId, token, err := service.Login(c, Req.Username, Req.Password)
+	userId, token, err := service.Login(c, req.Username, req.Password)
 	resp.ReturnVal = map[string]interface{}{
 		"user_id": userId,
 		"token":   token,
