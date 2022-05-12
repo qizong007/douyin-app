@@ -9,12 +9,18 @@ import (
 func TestJWT(t *testing.T) {
 	conf.InitConf("./conf/default_conf.yaml")
 	initJWTVal()
+	userId := int64(1 << 50)
 	for i := 0; i < 10000; i++ {
-		token, err := GenerateToken(1, 1<<50)
+
+		token, err := GenerateToken(userId)
 		assert.Equal(t, nil, err)
+
 		c, err := ParseToken(token)
 		assert.Equal(t, nil, err)
-		assert.Equal(t, c.UserId, int64(1<<50))
-		assert.Equal(t, c.Id, 1)
+		assert.Equal(t, userId, c.UserId)
+
+		id, e := CheckToken(token)
+		assert.Equal(t, userId, id)
+		assert.Equal(t, nil, e)
 	}
 }
