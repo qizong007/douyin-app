@@ -16,7 +16,7 @@ type IdGenerator struct {
 	node *snowflake.Node
 }
 
-func initIdGenerator() {
+func InitIdGenerator() {
 	node, err := snowflake.NewNode(nodeNum)
 	if err != nil {
 		panic(err)

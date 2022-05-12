@@ -11,7 +11,7 @@ const (
 )
 
 func TestGenerateId(t *testing.T) {
-	initIdGenerator()
+	InitIdGenerator()
 	id1 := GenerateId()
 	id2 := GenerateId()
 	assert.Equal(t, int64(0), sequenceIdStepMask&id1)

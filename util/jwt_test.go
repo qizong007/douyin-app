@@ -8,7 +8,7 @@ import (
 
 func TestJWT(t *testing.T) {
 	conf.InitConf("./conf/default_conf.yaml")
-	initJWTVal()
+	InitJWTVal()
 	userId := int64(1 << 50)
 	for i := 0; i < 10000; i++ {
 
