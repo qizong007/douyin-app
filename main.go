@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	ConfPath = "./conf/default_conf.yaml"
+	ConfPath = "./conf/conf.yaml"
 )
 
 func main() {
@@ -18,6 +18,7 @@ func main() {
 	util.InitIdGenerator()
 	util.InitJWTVal()
 	util.InitValidate()
+	util.InitOSSClient(conf.Config)
 
 	r := gin.Default()
 	handler.Register(r)
