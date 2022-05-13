@@ -57,13 +57,7 @@ func GetAuthorsFromIds(ctx context.Context, ids []int64) ([]*Author, error) {
 
 	authors := make([]*Author, len(ids))
 	for i := range users {
-		authors[i] = &Author{
-			Id:            users[i].UserId,
-			Name:          users[i].Username,
-			FollowCount:   0,     // TODO
-			FollowerCount: 0,     // TODO
-			IsFollow:      false, // TODO
-		}
+		authors[i] = FillAuthor(users[i])
 	}
 
 	return authors, nil

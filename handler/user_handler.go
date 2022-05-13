@@ -1,12 +1,16 @@
 package handler
 
 import (
+	"douyin-app/domain"
+	"douyin-app/repository"
 	"douyin-app/service"
 	"douyin-app/util"
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"gorm.io/gorm"
+	"log"
 	"strings"
 )
 
@@ -92,4 +96,46 @@ func LoginHandler(c *gin.Context) {
 	resp.StatusCode = util.Success
 	util.MakeResponse(c, &resp)
 	return
+}
+
+func GetUserInfoHandler(c *gin.Context) {
+	token := c.Query("token")
+	if token == "" {
+		log.Println("GetUserInfoHandler Token <nil>")
+		util.MakeResponse(c, &util.HttpResponse{
+			StatusCode: util.ParamError,
+		})
+	}
+
+	userId, err := util.ParseToken(token)
+	if err != nil {
+		log.Println("GetUserInfoHandler ParseToken Failed", err)
+		util.MakeResponse(c, &util.HttpResponse{
+			StatusCode: util.WrongAuth,
+		})
+	}
+
+	userIdStr := c.Query("user_id")
+	if userIdStr != fmt.Sprintf("%d", userId) {
+		log.Println("user_id not correct")
+		util.MakeResponse(c, &util.HttpResponse{
+			StatusCode: util.WrongAuth,
+		})
+	}
+
+	user, err := repository.GetUserRepository().FindByUserId(c, userId)
+	if err != nil {
+		log.Println("GetUserRepository().FindByUserId Failed", err)
+		util.MakeResponse(c, &util.HttpResponse{
+			StatusCode: util.InternalServerError,
+		})
+	}
+
+	author := domain.FillAuthor(user)
+	util.MakeResponse(c, &util.HttpResponse{
+		StatusCode: util.Success,
+		ReturnVal: map[string]interface{}{
+			"user": author,
+		},
+	})
 }
