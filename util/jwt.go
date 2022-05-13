@@ -44,9 +44,9 @@ func GenerateToken(userId int64) (string, error) {
 }
 
 // 解析token，返回一个包含信息的用户声明
-func ParseToken(tokenString string) (*MyClaims, error) {
-	// 通过(tokenString,请求结构,返回秘钥的一个回调函数)这三个参数,返回一个token结构体
-	token, err := jwt.ParseWithClaims(tokenString, &MyClaims{}, func(token *jwt.Token) (i interface{}, err error) {
+func parseToken(token string) (*MyClaims, error) {
+	// 通过(tokenStruct,请求结构,返回秘钥的一个回调函数)这三个参数,返回一个token结构体
+	tokenStruct, err := jwt.ParseWithClaims(token, &MyClaims{}, func(token *jwt.Token) (i interface{}, err error) {
 		return mySecret, nil
 	})
 	if err != nil {
@@ -54,22 +54,22 @@ func ParseToken(tokenString string) (*MyClaims, error) {
 	}
 
 	// 校验token,token有效则返回myClaims请求
-	if myClaims, ok := token.Claims.(*MyClaims); ok && token.Valid {
+	if myClaims, ok := tokenStruct.Claims.(*MyClaims); ok && tokenStruct.Valid {
 		return myClaims, nil
 	}
 	//token无效，返回错误
-	return nil, errors.New("invalid token")
+	return nil, errors.New("invalid tokenStruct")
 }
 
-//对token进行检查
+//解析query中的token
 //token有效会返回解析出的userId,否则会返回错误
-func CheckToken(token string) (userId int64, err error) {
+func ParseToken(token string) (userId int64, err error) {
 
 	if token == "" {
 		return 0, ErrNoAuth
 	}
 
-	claim, err := ParseToken(token)
+	claim, err := parseToken(token)
 	if err != nil {
 		return 0, ErrWrongAuth
 	}

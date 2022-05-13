@@ -15,11 +15,11 @@ func TestJWT(t *testing.T) {
 		token, err := GenerateToken(userId)
 		assert.Equal(t, nil, err)
 
-		c, err := ParseToken(token)
+		c, err := parseToken(token)
 		assert.Equal(t, nil, err)
 		assert.Equal(t, userId, c.UserId)
 
-		id, e := CheckToken(token)
+		id, e := ParseToken(token)
 		assert.Equal(t, userId, id)
 		assert.Equal(t, nil, e)
 	}
