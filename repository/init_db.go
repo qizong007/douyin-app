@@ -10,7 +10,7 @@ import (
 
 func InitDB() {
 	initMySQL()
-	initRedis()
+	//initRedis()
 	initRepository()
 }
 
@@ -51,13 +51,19 @@ func initMySQL() {
 }
 
 var (
-	userRepo IUserRepository
+	userRepo  IUserRepository
+	videoRepo IVideoRepository
 )
 
 func initRepository() {
 	userRepo = &UserRepository{}
+	videoRepo = &VideoRepository{}
 }
 
 func GetUserRepository() IUserRepository {
 	return userRepo
+}
+
+func GetVideoRepository() IVideoRepository {
+	return videoRepo
 }

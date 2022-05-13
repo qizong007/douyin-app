@@ -38,7 +38,6 @@ type Conf struct {
 		AccessKeyId     string `yaml:"access_key_id"`
 		AccessKeySecret string `yaml:"access_key_secret"`
 		BucketName      string `yaml:"bucket_name"`
-		BucketDomain    string `yaml:"bucket_domain"`
 	}
 }
 
