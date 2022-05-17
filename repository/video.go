@@ -3,8 +3,7 @@ package repository
 import "context"
 
 type Video struct {
-	Id         int64  `json:"id" gorm:"primaryKey"`
-	VideoId    int64  `json:"video_id"`
+	VideoId    int64  `json:"video_id"gorm:"primaryKey"`
 	UserId     int64  `json:"user_id" gorm:"index"`
 	PlayUrl    string `json:"play_url"`
 	CoverUrl   string `json:"cover_url"`
