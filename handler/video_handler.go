@@ -186,5 +186,8 @@ func VideoFeedHandler(c *gin.Context) {
 
 // 获取本次返回的视频中，发布最早的时间，作为下次请求时的latest_time
 func getMostEarlyTime(videos []*repository.Video) int64 {
+	if len(videos) == 0 {
+		return time.Now().Unix()
+	}
 	return videos[len(videos)-1].CreateTime
 }
