@@ -32,9 +32,9 @@ func FillVideoList(ctx context.Context, videoList []*repository.Video, audienceI
 			Author:        authors[i],
 			PlayUrl:       videoList[i].PlayUrl,
 			CoverUrl:      videoList[i].CoverUrl,
-			FavoriteCount: 0,     //TODO
-			CommentCount:  0,     //TODO
-			IsFavorite:    false, //TODO
+			FavoriteCount: videoList[i].FavoriteCount, //TODO
+			CommentCount:  videoList[i].CommentCount,  //TODO
+			IsFavorite:    false,                      //TODO
 		}
 	}
 
