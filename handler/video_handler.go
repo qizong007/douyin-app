@@ -24,6 +24,14 @@ func VideoPublishHandler(c *gin.Context) {
 		})
 	}
 
+	title := c.PostForm("title")
+	if title == "" {
+		log.Println("VideoPublishHandler Title <nil>")
+		util.MakeResponse(c, &util.HttpResponse{
+			StatusCode: util.ParamError,
+		})
+	}
+
 	userId, err := util.ParseToken(token)
 	if err != nil {
 		log.Println("VideoPublishHandler ParseToken Failed", err)
@@ -68,6 +76,7 @@ func VideoPublishHandler(c *gin.Context) {
 		UserId:   userId,
 		PlayUrl:  playUrl,
 		CoverUrl: coverUrl,
+		Title:    title,
 	}); err != nil {
 		log.Println("GetVideoRepository().Create Failed", err)
 		util.MakeResponse(c, &util.HttpResponse{
