@@ -49,7 +49,7 @@ func VideoPublishHandler(c *gin.Context) {
 		})
 	}
 
-	objectName := fmt.Sprintf("%d_%s", time.Now().Unix(), videoFileHeader.Filename)
+	objectName := fmt.Sprintf("%d/%d_%s", userId, time.Now().Unix(), videoFileHeader.Filename)
 
 	// 上传视频文件
 	err = service.VideoPublish(objectName, videoFile)
