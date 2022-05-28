@@ -1,2 +1,7 @@
 .idea
 conf/conf.yaml
+service/video.go
+.gitignore
+.util
+go.mod
+go.sum
