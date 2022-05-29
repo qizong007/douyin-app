@@ -17,7 +17,7 @@ func FollowActionHandler(c *gin.Context) {
 	var req RelationReq
 	token := c.Query("token")
 	req.ToUserID, _ = util.Str2Int64(c.Query("to_user_id"))
-	req.ActionType = c.Query("action_type") // 1-关注 2-取消关注
+	req.ActionType = c.Query("action_type")
 	userId, err := util.ParseToken(token)
 	if err != nil {
 		log.Println("RelationHandler ParseToken Failed", err)
@@ -41,9 +41,37 @@ func FollowActionHandler(c *gin.Context) {
 }
 
 func GetFollowListHandler(c *gin.Context) {
-	// TODO
+	token := c.Query("token")
+	userId, err := util.ParseToken(token)
+	if err != nil {
+		log.Println("RelationHandler ParseToken Failed", err)
+		util.MakeResponse(c, &util.HttpResponse{
+			StatusCode: util.WrongAuth,
+		})
+	}
+
+	util.MakeResponse(c, &util.HttpResponse{
+		StatusCode: util.Success,
+		ReturnVal: map[string]interface{}{
+			"user_list": service.GetFollowList(c, userId),
+		},
+	})
 }
 
 func GetFollowerListHandler(c *gin.Context) {
-	// TODO
+	token := c.Query("token")
+	userId, err := util.ParseToken(token)
+	if err != nil {
+		log.Println("RelationHandler ParseToken Failed", err)
+		util.MakeResponse(c, &util.HttpResponse{
+			StatusCode: util.WrongAuth,
+		})
+	}
+
+	util.MakeResponse(c, &util.HttpResponse{
+		StatusCode: util.Success,
+		ReturnVal: map[string]interface{}{
+			"user_list": service.GetFollowerList(c, userId),
+		},
+	})
 }

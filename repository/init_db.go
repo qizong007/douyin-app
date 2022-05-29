@@ -6,7 +6,6 @@ import (
 	"github.com/go-redis/redis/v8"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"log"
 )
 
 func InitDB() {
@@ -47,7 +46,6 @@ func initMySQL() {
 	var err error
 	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{}) //这里用短变量声明会有歧义
 	if err != nil {
-		log.Println(err)
 		panic(err)
 	}
 }

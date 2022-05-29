@@ -16,19 +16,22 @@ type Follow struct {
 }
 
 type IFollowRepository interface {
-	IsFollow(context.Context, int64, int64) error
+	IsFollow(context.Context, int64, int64) (bool, error)
 	Create(context.Context, int64, int64) error
 	AddFollowerCount(context.Context, int64) error
 	AddFollowCount(context.Context, int64) error
 	Delete(context.Context, int64, int64) error
 	ReduceFollowerCount(context.Context, int64) error
 	ReduceFollowCount(context.Context, int64) error
+	FindByFromUserId(ctx context.Context, int64 int64) ([]*Follow, error)
+	FindByToUserId(ctx context.Context, int64 int64) ([]*Follow, error)
 }
 
 type FollowRepository struct{}
 
-func (r *FollowRepository) IsFollow(ctx context.Context, fromUserId, toUserId int64) error {
-	return DB.WithContext(ctx).First(&Follow{}, "to_user_id = ? and from_user_id = ? and delete_time = 0", toUserId, fromUserId).Error
+func (r *FollowRepository) IsFollow(ctx context.Context, fromUserId, toUserId int64) (bool, error) {
+	err := DB.WithContext(ctx).First(&Follow{}, "to_user_id = ? and from_user_id = ? and delete_time = 0", toUserId, fromUserId).Error
+	return err == nil, err
 }
 
 func (r *FollowRepository) Create(ctx context.Context, fromUserId, toUserId int64) error {
@@ -58,4 +61,16 @@ func (r *FollowRepository) ReduceFollowerCount(ctx context.Context, toUserId int
 func (r *FollowRepository) ReduceFollowCount(ctx context.Context, fromUserId int64) error {
 	return DB.WithContext(ctx).Model(&User{}).Where("user_id = ? and delete_time = 0", fromUserId).
 		UpdateColumn("follow_count", gorm.Expr("follow_count - 1")).Error
+}
+
+func (r *FollowRepository) FindByFromUserId(ctx context.Context, fromUserId int64) ([]*Follow, error) {
+	followList := make([]*Follow, 0)
+	err := DB.WithContext(ctx).Where("from_user_id = ? and delete_time = 0", fromUserId).Find(&followList).Error
+	return followList, err
+}
+
+func (r *FollowRepository) FindByToUserId(ctx context.Context, toUserId int64) ([]*Follow, error) {
+	followList := make([]*Follow, 0)
+	err := DB.WithContext(ctx).Where("to_user_id = ? and delete_time = 0", toUserId).Find(&followList).Error
+	return followList, err
 }

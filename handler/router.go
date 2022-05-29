@@ -17,6 +17,6 @@ func Register(r *gin.Engine) {
 
 	// relation
 	r.POST("douyin/relation/action/", FollowActionHandler)
-	r.GET("douyin/relation/follow/list/", GetFollowListHandler)     // TODO
-	r.GET("douyin/relation/follower/list/", GetFollowerListHandler) // TODO
+	r.GET("douyin/relation/follow/list/", GetFollowListHandler)
+	r.GET("douyin/relation/follower/list/", GetFollowerListHandler)
 }
