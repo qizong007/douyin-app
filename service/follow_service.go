@@ -4,6 +4,7 @@ import (
 	"context"
 	"douyin-app/domain"
 	"douyin-app/repository"
+	"douyin-app/util"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -27,13 +28,14 @@ func RelationAction(c *gin.Context, userId int64, toUserId int64, actionType str
 
 // Follow 关注
 func Follow(ctx context.Context, userId, toUserId int64) error {
-	// error不为空可能说明没有该关注记录(ErrRecordNotFound)，那我们取反就可以继续下面的关注操作；其他错误就直接返回
-	if err := repository.GetFollowRepository().FindByUserId(ctx, userId, toUserId); err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		return err
+	// error如果为空，说明已经关注了
+	err := repository.GetFollowRepository().FindByUserId(ctx, userId, toUserId)
+	if err == nil {
+		return util.ErrIsFollow
 	}
-	// error如果为空，说明已经关注了，直接退出方法
-	if err := repository.GetFollowRepository().FindByUserId(ctx, userId, toUserId); err == nil {
-		return nil
+	// ErrRecordNotFound 表示查询不到记录的错误
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
+		return err
 	}
 	// relation表新增relation
 	if err := repository.GetFollowRepository().Create(ctx, userId, toUserId); err != nil {
@@ -52,8 +54,12 @@ func Follow(ctx context.Context, userId, toUserId int64) error {
 
 // UnFollow 取消关注
 func UnFollow(ctx context.Context, userId, toUserId int64) error {
-	// error不为空，有可能是还没该记录(ErrRecordNotFound)，或者是网络、数据库的error，直接返回；为空的话直接继续下面操作
-	if err := repository.GetFollowRepository().FindByUserId(ctx, userId, toUserId); err != nil {
+	// error为空表示已查询到对应记录，继续取消关注逻辑，其余错误均返回
+	err := repository.GetFollowRepository().FindByUserId(ctx, userId, toUserId)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return util.ErrNotFollow
+	}
+	if err != nil {
 		return err
 	}
 	// relation表新增relation
