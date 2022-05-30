@@ -16,7 +16,7 @@ type Follow struct {
 }
 
 type IFollowRepository interface {
-	IsFollow(context.Context, int64, int64) (bool, error)
+	FindByUserId(context.Context, int64, int64) error
 	Create(context.Context, int64, int64) error
 	AddFollowerCount(context.Context, int64) error
 	AddFollowCount(context.Context, int64) error
@@ -29,9 +29,8 @@ type IFollowRepository interface {
 
 type FollowRepository struct{}
 
-func (r *FollowRepository) IsFollow(ctx context.Context, fromUserId, toUserId int64) (bool, error) {
-	err := DB.WithContext(ctx).First(&Follow{}, "to_user_id = ? and from_user_id = ? and delete_time = 0", toUserId, fromUserId).Error
-	return err == nil, err
+func (r *FollowRepository) FindByUserId(ctx context.Context, fromUserId, toUserId int64) error {
+	return DB.WithContext(ctx).First(&Follow{}, "to_user_id = ? and from_user_id = ? and delete_time = 0", toUserId, fromUserId).Error
 }
 
 func (r *FollowRepository) Create(ctx context.Context, fromUserId, toUserId int64) error {

@@ -25,7 +25,8 @@ func RelationAction(c *gin.Context, userId int64, toUserId int64, actionType str
 
 // Follow 关注
 func Follow(ctx context.Context, userId, toUserId int64) error {
-	if _, err := repository.GetFollowRepository().IsFollow(ctx, userId, toUserId); err == nil {
+	// error不为空说明没有该关注记录，继续下面的关注操作
+	if err := repository.GetFollowRepository().FindByUserId(ctx, userId, toUserId); err == nil {
 		return err
 	}
 	// relation表新增relation
@@ -45,7 +46,8 @@ func Follow(ctx context.Context, userId, toUserId int64) error {
 
 // UnFollow 取消关注
 func UnFollow(ctx context.Context, userId, toUserId int64) error {
-	if _, err := repository.GetFollowRepository().IsFollow(ctx, userId, toUserId); err != nil {
+	// error为空说明已经有该关注记录，继续下面的取消关注操作
+	if err := repository.GetFollowRepository().FindByUserId(ctx, userId, toUserId); err != nil {
 		return err
 	}
 	// relation表新增relation
@@ -68,11 +70,13 @@ func GetFollowList(ctx context.Context, userId int64) []*domain.UserInfo {
 	followList, err := repository.GetFollowRepository().FindByFromUserId(ctx, userId)
 	if err != nil {
 		log.Println("FindByFromUserId Failed", err)
+		return nil
 	}
 	userIds := domain.GetToUserIdsFromFollowList(followList)
 	userList, err := domain.GetUserInfosFromIds(ctx, userIds)
 	if err != nil {
 		log.Println("GetUserInfosFromIds Failed", err)
+		return nil
 	}
 	return userList
 }
@@ -82,11 +86,13 @@ func GetFollowerList(ctx context.Context, userId int64) []*domain.UserInfo {
 	followList, err := repository.GetFollowRepository().FindByToUserId(ctx, userId)
 	if err != nil {
 		log.Println("FindByToUserId Failed", err)
+		return nil
 	}
 	userIds := domain.GetFromUserIdsFromFollowList(followList)
 	userList, err := domain.GetUserInfosFromIds(ctx, userIds)
 	if err != nil {
 		log.Println("GetUserInfosFromIds Failed", err)
+		return nil
 	}
 	return userList
 }
