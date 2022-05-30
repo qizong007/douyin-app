@@ -2,15 +2,18 @@ package repository
 
 import (
 	"context"
+	"time"
 )
 
 type User struct {
-	UserId     int64  `json:"user_id" gorm:"primaryKey"`
-	Username   string `json:"username"`
-	Password   string `json:"password"`
-	CreateTime int64  `json:"create_time" gorm:"autoCreateTime"`
-	ModifyTime int64  `json:"modify_time" gorm:"autoUpdateTime"`
-	DeleteTime int64  `json:"delete_time"`
+	UserId        int64  `json:"user_id" gorm:"primaryKey"`
+	Username      string `json:"username"`
+	Password      string `json:"password"`
+	FollowCount   int64  `json:"follow_count"`
+	FollowerCount int64  `json:"follower_count"`
+	CreateTime    int64  `json:"create_time" gorm:"autoCreateTime"`
+	ModifyTime    int64  `json:"modify_time" gorm:"autoUpdateTime"`
+	DeleteTime    int64  `json:"delete_time"`
 }
 
 type IUserRepository interface {
@@ -33,7 +36,7 @@ func (r *UserRepository) Update(ctx context.Context, user *User) error {
 }
 
 func (r *UserRepository) DeleteByUserId(ctx context.Context, userId int64) error {
-	return DB.WithContext(ctx).Where("user_id = ? and delete_time = 0", userId).Delete(User{}).Error
+	return DB.WithContext(ctx).Where("user_id = ? and delete_time = 0", userId).Update("delete_time", time.Now().Unix()).Error
 }
 
 func (r *UserRepository) FindByUserId(ctx context.Context, userId int64) (user *User, err error) {

@@ -5,10 +5,10 @@ redis:
   password:  ''  # no password set
   db:       0   #use default DB
 mysql:
-  username: "root"
-  password: "111111"
-  addr: "127.0.0.1:3306"
-  database: "douyin_app"
+  username: "gog"
+  password: "qwe@1234"
+  addr: "139.224.12.135:9801"
+  database: "tiktok"
 jwt:
   token_expire_duration: 240    #hour
   secrect: "天王盖地虎"           #token服务端秘钥
