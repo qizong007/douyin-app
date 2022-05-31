@@ -53,9 +53,10 @@ func initMySQL() {
 }
 
 var (
-	userRepo   IUserRepository
-	videoRepo  IVideoRepository
-	followRepo IFollowRepository
+	userRepo    IUserRepository
+	videoRepo   IVideoRepository
+	followRepo  IFollowRepository
+	commentRepo ICommentRepository
 )
 
 func initRepository() {
@@ -74,4 +75,8 @@ func GetVideoRepository() IVideoRepository {
 
 func GetFollowRepository() IFollowRepository {
 	return followRepo
+}
+
+func GetCommentRepository() ICommentRepository {
+	return commentRepo
 }

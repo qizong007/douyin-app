@@ -19,4 +19,8 @@ func Register(r *gin.Engine) {
 	r.POST("douyin/relation/action/", FollowActionHandler)
 	r.GET("douyin/relation/follow/list/", GetFollowListHandler)
 	r.GET("douyin/relation/follower/list/", GetFollowerListHandler)
+
+	// comment
+	r.POST("/douyin/comment/action/", CommentHandler)
+	r.GET("/douyin/comment/list/", CommentListHandler)
 }
