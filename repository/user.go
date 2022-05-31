@@ -36,7 +36,7 @@ func (r *UserRepository) Update(ctx context.Context, user *User) error {
 }
 
 func (r *UserRepository) DeleteByUserId(ctx context.Context, userId int64) error {
-	return DB.WithContext(ctx).Where("user_id = ? and delete_time = 0", userId).Update("delete_time", time.Now().Unix()).Error
+	return DB.WithContext(ctx).Model(&User{}).Where("user_id = ? and delete_time = 0", userId).Update("delete_time", time.Now().Unix()).Error
 }
 
 func (r *UserRepository) FindByUserId(ctx context.Context, userId int64) (user *User, err error) {
