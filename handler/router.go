@@ -14,4 +14,8 @@ func Register(r *gin.Engine) {
 	r.POST("/douyin/publish/action/", VideoPublishHandler)
 	r.GET("/douyin/publish/list/", VideoPublishedListHandler)
 	r.GET("/douyin/feed/", VideoFeedHandler)
+
+	// comment
+	r.POST("/douyin/comment/action/", CommentHandler)
+	r.GET("/douyin/comment/list/", CommentListHandler)
 }
