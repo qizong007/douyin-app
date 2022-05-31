@@ -2,7 +2,6 @@ package domain
 
 import (
 	"douyin-app/repository"
-	"fmt"
 )
 
 // Author 作为观众看到的创作者
@@ -22,6 +21,5 @@ func FillAuthor(user *repository.User, isFollow bool) *Author {
 		FollowerCount: user.FollowerCount,
 		IsFollow:      isFollow,
 	}
-	fmt.Println(author)
 	return author
 }
