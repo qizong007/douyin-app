@@ -44,7 +44,9 @@ func initMySQL() {
 		"?charset=utf8mb4&parseTime=True&loc=Local"
 
 	var err error
-	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{}) //这里用短变量声明会有歧义
+	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
+		//Logger: logger.Default.LogMode(logger.Info),
+	}) //这里用短变量声明会有歧义
 	if err != nil {
 		panic(err)
 	}

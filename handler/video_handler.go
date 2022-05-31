@@ -22,6 +22,7 @@ func VideoPublishHandler(c *gin.Context) {
 		util.MakeResponse(c, &util.HttpResponse{
 			StatusCode: util.ParamError,
 		})
+		return
 	}
 
 	title := c.PostForm("title")
@@ -30,6 +31,7 @@ func VideoPublishHandler(c *gin.Context) {
 		util.MakeResponse(c, &util.HttpResponse{
 			StatusCode: util.ParamError,
 		})
+		return
 	}
 
 	userId, err := util.ParseToken(token)
@@ -38,6 +40,7 @@ func VideoPublishHandler(c *gin.Context) {
 		util.MakeResponse(c, &util.HttpResponse{
 			StatusCode: util.WrongAuth,
 		})
+		return
 	}
 
 	// 读取视频文件数据
@@ -47,6 +50,7 @@ func VideoPublishHandler(c *gin.Context) {
 		util.MakeResponse(c, &util.HttpResponse{
 			StatusCode: util.ParamError,
 		})
+		return
 	}
 
 	videoFile, err := videoFileHeader.Open()
@@ -55,6 +59,7 @@ func VideoPublishHandler(c *gin.Context) {
 		util.MakeResponse(c, &util.HttpResponse{
 			StatusCode: util.InternalServerError,
 		})
+		return
 	}
 
 	objectName := fmt.Sprintf("%d/%d_%s", userId, time.Now().Unix(), videoFileHeader.Filename)
@@ -66,6 +71,7 @@ func VideoPublishHandler(c *gin.Context) {
 		util.MakeResponse(c, &util.HttpResponse{
 			StatusCode: util.InternalServerError,
 		})
+		return
 	}
 
 	playUrl := service.VideoUploadUrlPrefix + objectName
@@ -82,6 +88,7 @@ func VideoPublishHandler(c *gin.Context) {
 		util.MakeResponse(c, &util.HttpResponse{
 			StatusCode: util.InternalServerError,
 		})
+		return
 	}
 
 	util.MakeResponse(c, &util.HttpResponse{
@@ -96,14 +103,26 @@ func VideoPublishedListHandler(c *gin.Context) {
 		util.MakeResponse(c, &util.HttpResponse{
 			StatusCode: util.ParamError,
 		})
+		return
 	}
 
-	userId, err := util.ParseToken(token)
+	loginUserId, err := util.ParseToken(token)
 	if err != nil {
 		log.Println("VideoPublishedListHandler ParseToken Failed", err)
 		util.MakeResponse(c, &util.HttpResponse{
 			StatusCode: util.WrongAuth,
 		})
+		return
+	}
+
+	userIdStr := c.Query("user_id")
+	userId, err := util.Str2Int64(userIdStr)
+	if err != nil {
+		log.Println("Str2Int64 Failed", err)
+		util.MakeResponse(c, &util.HttpResponse{
+			StatusCode: util.InternalServerError,
+		})
+		return
 	}
 
 	videoList, err := repository.GetVideoRepository().FindByUserId(c, userId)
@@ -112,14 +131,16 @@ func VideoPublishedListHandler(c *gin.Context) {
 		util.MakeResponse(c, &util.HttpResponse{
 			StatusCode: util.InternalServerError,
 		})
+		return
 	}
 
-	videoDOs, err := domain.FillVideoList(c, videoList, userId)
+	videoDOs, err := domain.FillVideoList(c, videoList, loginUserId)
 	if err != nil {
 		log.Println("FillVideoList Failed", err)
 		util.MakeResponse(c, &util.HttpResponse{
 			StatusCode: util.InternalServerError,
 		})
+		return
 	}
 
 	util.MakeResponse(c, &util.HttpResponse{
@@ -147,6 +168,7 @@ func VideoFeedHandler(c *gin.Context) {
 			util.MakeResponse(c, &util.HttpResponse{
 				StatusCode: util.WrongAuth,
 			})
+			return
 		}
 	}
 
@@ -157,6 +179,7 @@ func VideoFeedHandler(c *gin.Context) {
 			util.MakeResponse(c, &util.HttpResponse{
 				StatusCode: util.InternalServerError,
 			})
+			return
 		}
 	} else { // 传入了 latest_time
 		latestTime, err := util.Str2Int64(latestTimeStr)
@@ -165,6 +188,7 @@ func VideoFeedHandler(c *gin.Context) {
 			util.MakeResponse(c, &util.HttpResponse{
 				StatusCode: util.InternalServerError,
 			})
+			return
 		}
 
 		videoList, err = repository.GetVideoRepository().FindByCreateTimeWithLimit(c, latestTime, FeedLimit)
@@ -173,6 +197,7 @@ func VideoFeedHandler(c *gin.Context) {
 			util.MakeResponse(c, &util.HttpResponse{
 				StatusCode: util.InternalServerError,
 			})
+			return
 		}
 	}
 
@@ -182,6 +207,7 @@ func VideoFeedHandler(c *gin.Context) {
 		util.MakeResponse(c, &util.HttpResponse{
 			StatusCode: util.InternalServerError,
 		})
+		return
 	}
 	util.MakeResponse(c, &util.HttpResponse{
 		StatusCode: util.Success,
