@@ -24,16 +24,16 @@ func FillComment(comment *repository.Comment, user *repository.User) *Comment {
 			Name:          user.Username,
 			FollowCount:   user.FollowCount,
 			FollowerCount: user.FollowerCount,
-			IsFollow:      false, //这里作者是自己,所以是false
+			IsFollow:      true, //这里作者是自己,所以是true
 		},
 		Content:    comment.Content,
 		CreateDate: timeStr[5:10], //mm-dd
 	}
 }
 
-func FillCommentList(ctx context.Context, comments []*repository.Comment) ([]*Comment, error) {
+func FillCommentList(ctx context.Context, comments []*repository.Comment, userId int64) ([]*Comment, error) {
 	userIds := GetUserIdsFromCommentList(comments)
-	authors, err := GetAuthorsFromIds(ctx, userIds)
+	authors, err := getAuthorsFromIds(ctx, userIds, userId)
 	log.Println("ids", userIds)
 	log.Println("authors", authors)
 	if err != nil {

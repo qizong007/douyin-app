@@ -18,16 +18,23 @@ type Comment struct {
 
 type ICommentRepository interface {
 	Create(context.Context, *Comment) error
+	FindByCommentId(context.Context, int64) (*Comment, error)
 	FindByVideoId(context.Context, int64) ([]*Comment, error)
 	AddCommentCount(context.Context, *Comment) error
 	ReduceCommentCount(context.Context, *Comment) error
-	DeleteByCommentId(context.Context, int64) (int64, error)
+	DeleteByCommentId(context.Context, int64) error
 }
 
 type CommentRepository struct{}
 
 func (r *CommentRepository) Create(ctx context.Context, comment *Comment) error {
 	return DB.WithContext(ctx).Create(&comment).Error
+}
+
+func (r *CommentRepository) FindByCommentId(ctx context.Context, commentId int64) (*Comment, error) {
+	comment := Comment{}
+	err := DB.WithContext(ctx).Where("comment_id = ? and delete_time = 0", commentId).First(&comment).Error
+	return &comment, err
 }
 
 func (r *CommentRepository) AddCommentCount(ctx context.Context, comment *Comment) error {
@@ -37,12 +44,12 @@ func (r *CommentRepository) AddCommentCount(ctx context.Context, comment *Commen
 
 func (r *CommentRepository) ReduceCommentCount(ctx context.Context, comment *Comment) error {
 	return DB.WithContext(ctx).Model(&Video{}).Where("video_id = ? and delete_time = 0", comment.VideoId).
-		UpdateColumn("comment_count", gorm.Expr("comment_count + 1")).Error
+		UpdateColumn("comment_count", gorm.Expr("comment_count - 1")).Error
 }
 
-func (r *CommentRepository) DeleteByCommentId(ctx context.Context, commentId int64) (rowsAffected int64, err error) {
-	result := DB.Model(&Comment{}).WithContext(ctx).Where("comment_id =? and delete_time =0", commentId).Update("delete_time", time.Now().Unix())
-	return result.RowsAffected, result.Error
+func (r *CommentRepository) DeleteByCommentId(ctx context.Context, commentId int64) error {
+	err := DB.Model(&Comment{}).WithContext(ctx).Where("comment_id =? and delete_time =0", commentId).Update("delete_time", time.Now().Unix()).Error
+	return err
 }
 
 func (r *CommentRepository) FindByVideoId(ctx context.Context, videoId int64) ([]*Comment, error) {

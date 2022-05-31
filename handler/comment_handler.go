@@ -39,6 +39,7 @@ func CommentHandler(c *gin.Context) {
 			return
 		}
 	}
+
 	//解析UserId
 	reqUserId := c.Query("user_id")
 	userId, err := util.Str2Int64(reqUserId)
@@ -58,6 +59,7 @@ func CommentHandler(c *gin.Context) {
 		})
 		return
 	}
+
 	//根据actionType做功能的拆分
 	switch actionType {
 	case PublishCommentType:
@@ -152,15 +154,17 @@ func DeleteCommentHandler(c *gin.Context) {
 
 	err = service.DeleteComment(c, commentId)
 	if err != nil {
-		if errors.Is(err, util.ErrCommentNotExist) {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			util.MakeResponse(c, &util.HttpResponse{
 				StatusCode: util.CommentNotExist,
 			})
+			return
 		} else {
 			log.Println("service.DeleteComment Err=", err)
 			util.MakeResponse(c, &util.HttpResponse{
 				StatusCode: util.InternalServerError,
 			})
+			return
 		}
 	}
 
@@ -175,7 +179,7 @@ func DeleteCommentHandler(c *gin.Context) {
 func CommentListHandler(c *gin.Context) {
 	token := c.Query("token")
 	//解析token
-	_, err := util.ParseToken(token)
+	userId, err := util.ParseToken(token)
 	if err != nil {
 		if errors.Is(err, util.ErrNoAuth) {
 			log.Println("CommentHandler Token <nil>")
@@ -227,7 +231,7 @@ func CommentListHandler(c *gin.Context) {
 		})
 		return
 	}
-	commentDOs, err := domain.FillCommentList(c, comments)
+	commentDOs, err := domain.FillCommentList(c, comments, userId)
 	if err != nil {
 		log.Println("CommentListHandler domain.FillCommentList Failed")
 		util.MakeResponse(c, &util.HttpResponse{
