@@ -1,7 +1,10 @@
 package domain
 
-import "douyin-app/repository"
+import (
+	"douyin-app/repository"
+)
 
+// Author 作为观众看到的创作者
 type Author struct {
 	Id            int64  `json:"id"`
 	Name          string `json:"name"`
@@ -10,13 +13,13 @@ type Author struct {
 	IsFollow      bool   `json:"is_follow"`
 }
 
-func FillAuthor(user *repository.User) *Author {
+func FillAuthor(user *repository.User, isFollow bool) *Author {
 	author := &Author{
 		Id:            user.UserId,
 		Name:          user.Username,
-		FollowCount:   0,     // TODO
-		FollowerCount: 0,     // TODO
-		IsFollow:      false, // TODO
+		FollowCount:   user.FollowCount,
+		FollowerCount: user.FollowerCount,
+		IsFollow:      isFollow,
 	}
 	return author
 }
