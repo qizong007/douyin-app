@@ -104,6 +104,7 @@ func GetUserInfoHandler(c *gin.Context) {
 		util.MakeResponse(c, &util.HttpResponse{
 			StatusCode: util.ParamError,
 		})
+		return
 	}
 
 	loginUserId, err := util.ParseToken(token)
@@ -112,6 +113,7 @@ func GetUserInfoHandler(c *gin.Context) {
 		util.MakeResponse(c, &util.HttpResponse{
 			StatusCode: util.WrongAuth,
 		})
+		return
 	}
 
 	userIdStr := c.Query("user_id")
@@ -121,6 +123,7 @@ func GetUserInfoHandler(c *gin.Context) {
 		util.MakeResponse(c, &util.HttpResponse{
 			StatusCode: util.InternalServerError,
 		})
+		return
 	}
 
 	user, err := repository.GetUserRepository().FindByUserId(c, userId)
@@ -129,6 +132,7 @@ func GetUserInfoHandler(c *gin.Context) {
 		util.MakeResponse(c, &util.HttpResponse{
 			StatusCode: util.InternalServerError,
 		})
+		return
 	}
 
 	isFollow := true
@@ -140,6 +144,7 @@ func GetUserInfoHandler(c *gin.Context) {
 			util.MakeResponse(c, &util.HttpResponse{
 				StatusCode: util.InternalServerError,
 			})
+			return
 		}
 		if err != nil {
 			isFollow = false

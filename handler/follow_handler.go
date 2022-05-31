@@ -24,6 +24,7 @@ func FollowActionHandler(c *gin.Context) {
 		util.MakeResponse(c, &util.HttpResponse{
 			StatusCode: util.WrongAuth,
 		})
+		return
 	}
 	req.UserID = userId // 客户端的请求里没有接口文档里说的userId，直接通过token解析
 	err = service.RelationAction(c, req.UserID, req.ToUserID, req.ActionType)
@@ -32,6 +33,7 @@ func FollowActionHandler(c *gin.Context) {
 		util.MakeResponse(c, &util.HttpResponse{
 			StatusCode: util.InternalServerError,
 		})
+		return
 	}
 
 	util.MakeResponse(c, &util.HttpResponse{
@@ -48,6 +50,7 @@ func GetFollowListHandler(c *gin.Context) {
 		util.MakeResponse(c, &util.HttpResponse{
 			StatusCode: util.WrongAuth,
 		})
+		return
 	}
 
 	util.MakeResponse(c, &util.HttpResponse{
@@ -66,6 +69,7 @@ func GetFollowerListHandler(c *gin.Context) {
 		util.MakeResponse(c, &util.HttpResponse{
 			StatusCode: util.WrongAuth,
 		})
+		return
 	}
 
 	util.MakeResponse(c, &util.HttpResponse{
