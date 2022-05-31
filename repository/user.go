@@ -47,7 +47,31 @@ func (r *UserRepository) FindByUserId(ctx context.Context, userId int64) (user *
 func (r *UserRepository) FindByUserIds(ctx context.Context, userIdList []int64) ([]*User, error) {
 	users := make([]*User, 0)
 	err := DB.WithContext(ctx).Where("user_id in (?) and delete_time = 0", userIdList).Find(&users).Error
-	return users, err
+	if err != nil {
+		return nil, err
+	}
+	// record: id -> user
+	id2UserMap := map[int64]*User{}
+	for i := range users {
+		if users[i] != nil {
+			id2UserMap[users[i].UserId] = users[i]
+		}
+	}
+	// fill
+	res := make([]*User, len(userIdList))
+	for i, id := range userIdList {
+		res[i] = &User{
+			UserId:        id2UserMap[id].UserId,
+			Username:      id2UserMap[id].Username,
+			Password:      id2UserMap[id].Password,
+			FollowCount:   id2UserMap[id].FollowCount,
+			FollowerCount: id2UserMap[id].FollowerCount,
+			CreateTime:    id2UserMap[id].CreateTime,
+			ModifyTime:    id2UserMap[id].ModifyTime,
+			DeleteTime:    id2UserMap[id].DeleteTime,
+		}
+	}
+	return res, nil
 }
 
 func (r *UserRepository) FindByUsername(ctx context.Context, username string) (user *User, err error) {
