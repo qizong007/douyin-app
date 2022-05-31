@@ -20,7 +20,7 @@ func FillVideoList(ctx context.Context, videoList []*repository.Video, audienceI
 	res := make([]*VideoDO, len(videoList))
 
 	authorIds := GetUserIdsFromVideoList(videoList)
-	authors, err := GetAuthorsFromIds(ctx, authorIds)
+	authors, err := getAuthorsFromIds(ctx, authorIds, audienceId)
 	if err != nil {
 		return nil, err
 	}
@@ -51,16 +51,37 @@ func GetUserIdsFromVideoList(videoList []*repository.Video) []int64 {
 	return ids
 }
 
-func GetAuthorsFromIds(ctx context.Context, ids []int64) ([]*Author, error) {
+func getAuthorsFromIds(ctx context.Context, ids []int64, audienceId int64) ([]*Author, error) {
 	users, err := repository.GetUserRepository().FindByUserIds(ctx, ids)
+	if err != nil {
+		return nil, err
+	}
+
+	followedUserSet, err := getFollowedUserSet(ctx, audienceId)
 	if err != nil {
 		return nil, err
 	}
 
 	authors := make([]*Author, len(ids))
 	for i := range users {
-		authors[i] = FillAuthor(users[i])
+		_, ok := followedUserSet[users[i].UserId]
+		authors[i] = FillAuthor(users[i], ok)
 	}
 
 	return authors, nil
+}
+
+// 获取该用户关注的用户的ID集合
+func getFollowedUserSet(ctx context.Context, fromId int64) (map[int64]struct{}, error) {
+	followedUsers, err := repository.GetFollowRepository().FindByFromUserId(ctx, fromId)
+	if err != nil {
+		return nil, err
+	}
+	followedUserSet := map[int64]struct{}{}
+	for i := range followedUsers {
+		followedUserSet[followedUsers[i].ToUserId] = struct{}{}
+	}
+	// 默认让前端显示关注自己
+	followedUserSet[fromId] = struct{}{}
+	return followedUserSet, nil
 }

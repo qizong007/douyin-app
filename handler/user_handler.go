@@ -6,7 +6,6 @@ import (
 	"douyin-app/service"
 	"douyin-app/util"
 	"errors"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"gorm.io/gorm"
@@ -105,22 +104,26 @@ func GetUserInfoHandler(c *gin.Context) {
 		util.MakeResponse(c, &util.HttpResponse{
 			StatusCode: util.ParamError,
 		})
+		return
 	}
 
-	userId, err := util.ParseToken(token)
+	loginUserId, err := util.ParseToken(token)
 	if err != nil {
 		log.Println("GetUserInfoHandler ParseToken Failed", err)
 		util.MakeResponse(c, &util.HttpResponse{
 			StatusCode: util.WrongAuth,
 		})
+		return
 	}
 
 	userIdStr := c.Query("user_id")
-	if userIdStr != fmt.Sprintf("%d", userId) {
-		log.Println("user_id not correct")
+	userId, err := util.Str2Int64(userIdStr)
+	if err != nil {
+		log.Println("Str2Int64 Failed", err)
 		util.MakeResponse(c, &util.HttpResponse{
-			StatusCode: util.WrongAuth,
+			StatusCode: util.InternalServerError,
 		})
+		return
 	}
 
 	user, err := repository.GetUserRepository().FindByUserId(c, userId)
@@ -129,9 +132,26 @@ func GetUserInfoHandler(c *gin.Context) {
 		util.MakeResponse(c, &util.HttpResponse{
 			StatusCode: util.InternalServerError,
 		})
+		return
 	}
 
-	author := domain.FillAuthor(user)
+	isFollow := true
+
+	if loginUserId == userId {
+		err = repository.GetFollowRepository().FindByUserId(c, loginUserId, userId)
+		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+			log.Println("GetFollowRepository().FindByUserId Failed", err)
+			util.MakeResponse(c, &util.HttpResponse{
+				StatusCode: util.InternalServerError,
+			})
+			return
+		}
+		if err != nil {
+			isFollow = false
+		}
+	}
+
+	author := domain.FillAuthor(user, isFollow)
 	util.MakeResponse(c, &util.HttpResponse{
 		StatusCode: util.Success,
 		ReturnVal: map[string]interface{}{
