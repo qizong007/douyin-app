@@ -36,7 +36,7 @@ func (r *VideoRepository) FindByUserId(ctx context.Context, userId int64) ([]*Vi
 
 func (r *VideoRepository) FindByVideoId(ctx context.Context, videoId int64) (*Video, error) {
 	video := Video{}
-	err := DB.WithContext(ctx).Where("video_id = ? and delete_time = 0", videoId).Find(&video).Error
+	err := DB.WithContext(ctx).Where("video_id = ? and delete_time = 0", videoId).First(&video).Error
 	return &video, err
 }
 
