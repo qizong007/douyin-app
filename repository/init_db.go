@@ -63,6 +63,7 @@ func initRepository() {
 	userRepo = &UserRepository{}
 	videoRepo = &VideoRepository{}
 	followRepo = &FollowRepository{}
+	commentRepo = &CommentRepository{}
 }
 
 func GetUserRepository() IUserRepository {
