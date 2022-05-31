@@ -97,3 +97,59 @@ func TestUserRepo(t *testing.T) {
 	}
 	log.Println(user)
 }
+
+//这个方法大多数情况可以达到更好的性能
+func Benchmark_FindByUserIds(b *testing.B) {
+	conf.InitConf(confPath)
+	initMySQL()
+	initRepository()
+	ctx := context.Background()
+	var ids []int64
+	for k := 0; k < 5; k++ {
+		ids = append(ids, 6774665417138176)
+	}
+	for k := 0; k < 5; k++ {
+		ids = append(ids, 6774736186019840)
+	}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		GetUserRepository().FindByUserIds(ctx, ids)
+	}
+}
+
+func Benchmark_myFindByIds(b *testing.B) {
+	conf.InitConf(confPath)
+	initMySQL()
+	initRepository()
+	ctx := context.Background()
+	var ids []int64
+	for k := 0; k < 5; k++ {
+		ids = append(ids, 6774665417138176)
+	}
+	for k := 0; k < 5; k++ {
+		ids = append(ids, 6774736186019840)
+	}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		testFindByUserIds(ctx, ids)
+	}
+}
+
+//low performance
+func testFindByUserIds(ctx context.Context, userIdList []int64) ([]*User, error) {
+	users := make([]*User, len(userIdList))
+
+	for i := range userIdList {
+		if i-1 > 0 && userIdList[i] == userIdList[i-1] {
+			users[i] = users[i-1]
+		} else {
+			err := DB.WithContext(ctx).Where("user_id = (?) and delete_time = 0", userIdList[i]).Find(&users[i]).Error
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+	return users, nil
+}
