@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"time"
 )
 
 type Favorite struct {
@@ -19,6 +20,8 @@ type IFavoriteRepository interface {
 	DeleteByUserIdAndVideoId(context.Context, int64, int64) error
 	//FindByVideoIdAndUserId(context.Context, int64, int64) (*Favorite, error)
 	FindVideoListByUseId(context.Context, int64) ([]*Favorite, error)
+	FindFavoriteRecord(ctx context.Context, userId int64, videoId int64) (favorite *Favorite, err error)
+	UpdateFavorite(ctx context.Context, userId int64, videoId int64, favorite *Favorite) (err error)
 }
 
 type FavoriteRepository struct{}
@@ -27,6 +30,16 @@ func (r *FavoriteRepository) FindVideoListByUseId(ctx context.Context, userId in
 	favorite := make([]*Favorite, 0)
 	err := DB.WithContext(ctx).Order("create_time desc").Where("user_id = ?", userId).Find(&favorite).Error
 	return favorite, err
+}
+
+func (r *FavoriteRepository) FindFavoriteRecord(ctx context.Context, userId int64, videoId int64) (favorite *Favorite, err error) {
+	err = DB.WithContext(ctx).Where("user_id = ? and video_id = ?", userId, videoId).First(&favorite).Error
+	return favorite, err
+}
+
+func (r *FavoriteRepository) UpdateFavorite(ctx context.Context, userId int64, videoId int64, favorite *Favorite) (err error) {
+	err = DB.WithContext(ctx).Model(&Favorite{}).Where("user_id = ? and video_id = ?", userId, videoId).Update("delete_time", favorite.DeleteTime).Error
+	return err
 }
 
 func (r *FavoriteRepository) Create(ctx context.Context, favorite *Favorite) error {
@@ -38,7 +51,7 @@ func (r *FavoriteRepository) Update(ctx context.Context, favorite *Favorite) err
 }
 
 func (r *FavoriteRepository) DeleteByUserIdAndVideoId(ctx context.Context, userId int64, videoId int64) error {
-	return DB.WithContext(ctx).Where("user_id = ? and video_id = ?", userId, videoId).Delete(Favorite{}).Error
+	return DB.WithContext(ctx).Model(&Favorite{}).Where("user_id = ? and video_id = ?", userId, videoId).Update("delete_time", time.Now().Unix()).Error
 }
 
 //type IVideoRepository interface {

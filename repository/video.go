@@ -57,6 +57,6 @@ func (r *VideoRepository) FindByCreateTimeWithLimit(ctx context.Context, createT
 
 func (r *VideoRepository) VideoFavoriteAdd(ctx context.Context, video *Video, videoId int64) (err error) {
 	log.Println("video.favorite", video.FavoriteCount)
-	err = DB.WithContext(ctx).Where("video_id = ? ", videoId).Updates(video).Error
+	err = DB.WithContext(ctx).Model(&Video{}).Where("video_id = ? ", videoId).Update("favorite_count", video.FavoriteCount).Error
 	return err
 }

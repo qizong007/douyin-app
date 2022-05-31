@@ -22,6 +22,7 @@ func VideoPublishHandler(c *gin.Context) {
 		util.MakeResponse(c, &util.HttpResponse{
 			StatusCode: util.ParamError,
 		})
+		return
 	}
 
 	title := c.PostForm("title")
@@ -30,6 +31,7 @@ func VideoPublishHandler(c *gin.Context) {
 		util.MakeResponse(c, &util.HttpResponse{
 			StatusCode: util.ParamError,
 		})
+		return
 	}
 
 	userId, err := util.ParseToken(token)
@@ -38,6 +40,7 @@ func VideoPublishHandler(c *gin.Context) {
 		util.MakeResponse(c, &util.HttpResponse{
 			StatusCode: util.WrongAuth,
 		})
+		return
 	}
 
 	// 读取视频文件数据
@@ -47,6 +50,7 @@ func VideoPublishHandler(c *gin.Context) {
 		util.MakeResponse(c, &util.HttpResponse{
 			StatusCode: util.ParamError,
 		})
+		return
 	}
 
 	videoFile, err := videoFileHeader.Open()
@@ -55,6 +59,7 @@ func VideoPublishHandler(c *gin.Context) {
 		util.MakeResponse(c, &util.HttpResponse{
 			StatusCode: util.InternalServerError,
 		})
+		return
 	}
 
 	objectName := fmt.Sprintf("%d/%d_%s", userId, time.Now().Unix(), videoFileHeader.Filename)
@@ -66,6 +71,7 @@ func VideoPublishHandler(c *gin.Context) {
 		util.MakeResponse(c, &util.HttpResponse{
 			StatusCode: util.InternalServerError,
 		})
+		return
 	}
 
 	playUrl := service.VideoUploadUrlPrefix + objectName
@@ -82,6 +88,7 @@ func VideoPublishHandler(c *gin.Context) {
 		util.MakeResponse(c, &util.HttpResponse{
 			StatusCode: util.InternalServerError,
 		})
+		return
 	}
 
 	util.MakeResponse(c, &util.HttpResponse{
@@ -96,14 +103,26 @@ func VideoPublishedListHandler(c *gin.Context) {
 		util.MakeResponse(c, &util.HttpResponse{
 			StatusCode: util.ParamError,
 		})
+		return
 	}
 
-	userId, err := util.ParseToken(token)
+	loginUserId, err := util.ParseToken(token)
 	if err != nil {
 		log.Println("VideoPublishedListHandler ParseToken Failed", err)
 		util.MakeResponse(c, &util.HttpResponse{
 			StatusCode: util.WrongAuth,
 		})
+		return
+	}
+
+	userIdStr := c.Query("user_id")
+	userId, err := util.Str2Int64(userIdStr)
+	if err != nil {
+		log.Println("Str2Int64 Failed", err)
+		util.MakeResponse(c, &util.HttpResponse{
+			StatusCode: util.InternalServerError,
+		})
+		return
 	}
 
 	videoList, err := repository.GetVideoRepository().FindByUserId(c, userId)
@@ -112,14 +131,17 @@ func VideoPublishedListHandler(c *gin.Context) {
 		util.MakeResponse(c, &util.HttpResponse{
 			StatusCode: util.InternalServerError,
 		})
+		return
 	}
 
-	videoDOs, err := domain.FillVideoList(c, videoList, userId, false)
+	videoDOs, err := domain.FillVideoList(c, videoList, loginUserId, false)
+
 	if err != nil {
 		log.Println("FillVideoList Failed", err)
 		util.MakeResponse(c, &util.HttpResponse{
 			StatusCode: util.InternalServerError,
 		})
+		return
 	}
 
 	util.MakeResponse(c, &util.HttpResponse{
@@ -148,6 +170,7 @@ func VideoFeedHandler(c *gin.Context) {
 			util.MakeResponse(c, &util.HttpResponse{
 				StatusCode: util.WrongAuth,
 			})
+			return
 		}
 	}
 
@@ -158,6 +181,7 @@ func VideoFeedHandler(c *gin.Context) {
 			util.MakeResponse(c, &util.HttpResponse{
 				StatusCode: util.InternalServerError,
 			})
+			return
 		}
 	} else { // 传入了 latest_time
 		latestTime, err := util.Str2Int64(latestTimeStr)
@@ -166,6 +190,7 @@ func VideoFeedHandler(c *gin.Context) {
 			util.MakeResponse(c, &util.HttpResponse{
 				StatusCode: util.InternalServerError,
 			})
+			return
 		}
 
 		videoList, err = repository.GetVideoRepository().FindByCreateTimeWithLimit(c, latestTime, FeedLimit)
@@ -174,6 +199,7 @@ func VideoFeedHandler(c *gin.Context) {
 			util.MakeResponse(c, &util.HttpResponse{
 				StatusCode: util.InternalServerError,
 			})
+			return
 		}
 	}
 
@@ -183,6 +209,7 @@ func VideoFeedHandler(c *gin.Context) {
 		util.MakeResponse(c, &util.HttpResponse{
 			StatusCode: util.InternalServerError,
 		})
+		return
 	}
 	util.MakeResponse(c, &util.HttpResponse{
 		StatusCode: util.Success,
@@ -202,6 +229,16 @@ func getMostEarlyTime(videos []*repository.Video) int64 {
 	return videos[len(videos)-1].CreateTime
 }
 
+/*
+	点赞操作：
+		1： 点赞，直接在favorite表创建 userid与favoriteId进行关联的数据，同时更新video表中 FavoriteCount 属性值
+		2： 取消点赞，直接删除favorite表中这条记录，同时更新video表中 FavoriteCount 属性值
+
+	actionTYpe == 1 点赞
+		1) 先查询有无favorite record,无则创建，有则delete_time = 0
+	actionType == 2 取消点赞
+		1) delete_time = now()
+*/
 func VideoFavoriteHandler(c *gin.Context) {
 	token := c.Query("token")
 	if token == "" {
@@ -220,45 +257,56 @@ func VideoFavoriteHandler(c *gin.Context) {
 	}
 
 	videoId := c.Query("video_id")
-	log.Println("[-1]:", videoId)
-
 	actionType := c.Query("action_type")
 
 	vid, err := util.Str2Int64(videoId)
-	log.Println("[0]:", vid)
-
-	video, err := repository.GetVideoRepository().FindByVideoId(c, vid)
-	//video.FavoriteCount += 1
-	log.Println("[1]:", video.VideoId)
-	/*
-		点赞操作：
-			1： 点赞，直接在favorite表创建 userid与favoriteId进行关联的数据，同时更新video表中 FavoriteCount 属性值
-			2： 取消点赞，直接删除favorite表中这条记录，同时更新video表中 FavoriteCount 属性值
-	*/
-	if actionType == "1" {
-		video.FavoriteCount += 1
-		favoriteId := util.GenerateId()
-		favorite := &repository.Favorite{
-			FavoriteId: favoriteId,
-			UserId:     userId,
-			VideoId:    vid,
-		}
-		// 创建 favorite信息
-		err = repository.GetFavoriteRepository().Create(c, favorite)
-	} else if actionType == "2" {
-		video.FavoriteCount -= 1
-		// 删除favorite信息
-		err = repository.GetFavoriteRepository().DeleteByUserIdAndVideoId(c, userId, vid)
-		if err != nil {
-			log.Println("aaaaaaaaa", err)
-		}
+	if err != nil {
+		log.Println("VideoFavoriteHandler Str2Int64 Failed", err)
+		util.MakeResponse(c, &util.HttpResponse{
+			StatusCode: util.WrongAuth,
+		})
 	}
 
-	log.Printf("favorite count %d", video.FavoriteCount)
+	video, err := repository.GetVideoRepository().FindByVideoId(c, vid)
+	if err != nil {
+		log.Println("VideoFavoriteHandler FindByVideoId Failed", err)
+		util.MakeResponse(c, &util.HttpResponse{
+			StatusCode: util.WrongAuth,
+		})
+	}
+
+	if actionType == "1" {
+		video.FavoriteCount += 1
+
+		favorite, err := repository.GetFavoriteRepository().FindFavoriteRecord(c, userId, vid)
+		log.Println("[aaaa]", favorite)
+
+		if err != nil {
+			favoriteId := util.GenerateId()
+			favorite := &repository.Favorite{
+				FavoriteId: favoriteId,
+				UserId:     userId,
+				VideoId:    vid,
+			}
+			//创建favorite
+			err = repository.GetFavoriteRepository().Create(c, favorite)
+		} else {
+			//点赞： 更新delete_time = 0
+			favorite.DeleteTime = 0
+			err = repository.GetFavoriteRepository().UpdateFavorite(c, userId, vid, favorite)
+		}
+	} else if actionType == "2" {
+		video.FavoriteCount -= 1
+		// 取消点赞： 更新delete_time = now()
+		err = repository.GetFavoriteRepository().DeleteByUserIdAndVideoId(c, userId, vid)
+	}
 
 	err = repository.GetVideoRepository().VideoFavoriteAdd(c, video, vid)
 	if err != nil {
-		log.Println("aaaAFASDFASDFaaaaaa", err)
+		log.Println("VideoFavoriteHandler VideoFavoriteAdd Failed", err)
+		util.MakeResponse(c, &util.HttpResponse{
+			StatusCode: util.WrongAuth,
+		})
 	}
 
 	util.MakeResponse(c, &util.HttpResponse{
@@ -291,6 +339,7 @@ func VedioFavoriteListHandler(c *gin.Context) {
 			})
 		}
 	}
+
 	// 得到favoriteList
 	favoriteList, err = repository.GetFavoriteRepository().FindVideoListByUseId(c, userId)
 	if err != nil {

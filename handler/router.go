@@ -14,8 +14,14 @@ func Register(r *gin.Engine) {
 	r.POST("/douyin/publish/action/", VideoPublishHandler)
 	r.GET("/douyin/publish/list/", VideoPublishedListHandler)
 	r.GET("/douyin/feed/", VideoFeedHandler)
+
 	//r.POST("")
 	// favorite
 	r.POST("/douyin/favorite/action/", VideoFavoriteHandler)
 	r.GET("/douyin/favorite/list/", VedioFavoriteListHandler)
+
+	// relation
+	r.POST("douyin/relation/action/", FollowActionHandler)
+	r.GET("douyin/relation/follow/list/", GetFollowListHandler)
+	r.GET("douyin/relation/follower/list/", GetFollowerListHandler)
 }
