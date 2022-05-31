@@ -23,8 +23,8 @@ type IFollowRepository interface {
 	Delete(context.Context, int64, int64) error
 	ReduceFollowerCount(context.Context, int64) error
 	ReduceFollowCount(context.Context, int64) error
-	FindByFromUserId(ctx context.Context, int64 int64) ([]*Follow, error)
-	FindByToUserId(ctx context.Context, int64 int64) ([]*Follow, error)
+	FindByFromUserId(context.Context, int64) ([]*Follow, error)
+	FindByToUserId(context.Context, int64) ([]*Follow, error)
 }
 
 type FollowRepository struct{}
