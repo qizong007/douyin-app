@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	ConfPath = "./conf/default_conf.yaml"
+	ConfPath = "./conf/conf.yaml"
 )
 
 func main() {

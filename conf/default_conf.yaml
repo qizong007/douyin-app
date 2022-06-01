@@ -5,9 +5,9 @@ redis:
   password:  ''  # no password set
   db:       0   #use default DB
 mysql:
-  username: "gog"
-  password: "qwe@1234"
-  addr: "139.224.12.135:9801"
+  username: "root"
+  password: "123456"
+  addr: "127.0.0.1:1316"
   database: "tiktok"
 jwt:
   token_expire_duration: 240    #hour

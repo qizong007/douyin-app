@@ -2,7 +2,7 @@ package repository
 
 import (
 	"context"
-	"log"
+	"gorm.io/gorm"
 )
 
 type Video struct {
@@ -24,8 +24,12 @@ type IVideoRepository interface {
 	FindByVideoId(context.Context, int64) (*Video, error)
 	FindWithLimit(context.Context, int) ([]*Video, error)
 	FindByCreateTimeWithLimit(context.Context, int64, int) ([]*Video, error)
-	VideoFavoriteAdd(context.Context, *Video, int64) error
+	UpdadteFavoriteCount(context.Context, *Video, int64) error
+	AddVideoFavoriteCount(context.Context, int64) error
+	DeleteVideoFavoriteCount(context.Context, int64) error
+	FindByVideoIds(context.Context, []int64) ([]*Video, error)
 }
+
 type VideoRepository struct{}
 
 func (r *VideoRepository) Create(ctx context.Context, video *Video) error {
@@ -39,7 +43,7 @@ func (r *VideoRepository) FindByUserId(ctx context.Context, userId int64) ([]*Vi
 }
 
 func (r *VideoRepository) FindByVideoId(ctx context.Context, videoId int64) (video *Video, err error) {
-	err = DB.WithContext(ctx).Where("video_id = ?", videoId).Find(&video).Error
+	err = DB.WithContext(ctx).Where("video_id = ?", videoId).First(&video).Error
 	return video, err
 }
 
@@ -55,8 +59,26 @@ func (r *VideoRepository) FindByCreateTimeWithLimit(ctx context.Context, createT
 	return videos, err
 }
 
-func (r *VideoRepository) VideoFavoriteAdd(ctx context.Context, video *Video, videoId int64) (err error) {
-	log.Println("video.favorite", video.FavoriteCount)
+func (r *VideoRepository) UpdadteFavoriteCount(ctx context.Context, video *Video, videoId int64) (err error) {
 	err = DB.WithContext(ctx).Model(&Video{}).Where("video_id = ? ", videoId).Update("favorite_count", video.FavoriteCount).Error
 	return err
+}
+
+func (r *VideoRepository) AddVideoFavoriteCount(ctx context.Context, videoId int64) error {
+	return DB.WithContext(ctx).Model(&Video{}).Where("video_id = ? and delete_time = 0", videoId).
+		UpdateColumn("favorite_count", gorm.Expr("favorite_count + 1")).Error
+}
+
+func (r *VideoRepository) DeleteVideoFavoriteCount(ctx context.Context, videoId int64) error {
+	return DB.WithContext(ctx).Model(&Video{}).Where("video_id = ?", videoId).
+		UpdateColumn("favorite_count", gorm.Expr("favorite_count - 1")).Error
+}
+
+func (r *VideoRepository) FindByVideoIds(ctx context.Context, VideoList []int64) ([]*Video, error) {
+	videos := make([]*Video, 0)
+	err := DB.WithContext(ctx).Model(&Video{}).Where("video_id in (?) and delete_time = 0", VideoList).Find(&videos).Error
+	if err != nil {
+		return nil, err
+	}
+	return videos, nil
 }
