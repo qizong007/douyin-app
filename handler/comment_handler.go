@@ -55,7 +55,7 @@ func CommentHandler(c *gin.Context) {
 		log.Println("CommentHandler UserId Does Not Match Token ")
 		util.MakeResponse(c, &util.HttpResponse{
 			StatusCode: util.ParamError,
-			StatusMsg:  "UserId Does Not Match Token",
+			StatusMsg:  "UserId与Token不匹配",
 		})
 		return
 	}
