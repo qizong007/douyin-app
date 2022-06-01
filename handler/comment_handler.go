@@ -65,6 +65,13 @@ func PublishCommentHandler(c *gin.Context, userId int64) {
 		})
 		return
 	}
+	if len(commentText) == 0 {
+		log.Println("PublishCommentHandler CommentText Is Null ")
+		util.MakeResponse(c, &util.HttpResponse{
+			StatusCode: util.CommentIsEmpty,
+		})
+		return
+	}
 
 	//解析videoId
 	reqVideoId := c.Query("video_id")

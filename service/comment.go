@@ -7,8 +7,11 @@ import (
 )
 
 func PublishComment(c *gin.Context, userId int64, videoId int64, content string) (*repository.Comment, *repository.User, error) {
-	//TODO  检查content敏感词
-
+	//检查是否含敏感词
+	find, _ := util.Filter.FindIn(content)
+	if find {
+		return nil, nil, util.ErrSensitiveComment
+	}
 	comment := &repository.Comment{
 		CommentId: util.GenerateId(),
 		UserId:    userId,
