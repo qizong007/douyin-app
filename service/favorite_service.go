@@ -80,25 +80,21 @@ func GetFavoriteList(ctx context.Context, userId int64) []*domain.VideoDO {
 		log.Println("GetVideoRepository().FindVideoListByUserId Failed", err)
 		return nil
 	}
-
 	var (
 		videoIdList []int64
 	)
 	for _, x := range favoriteList {
 		videoIdList = append(videoIdList, x.VideoId)
 	}
-
 	videoList, err := repository.GetVideoRepository().FindByVideoIds(ctx, videoIdList)
 	if err != nil {
 		log.Println("GetFavoriteList FindByVideoIds Failed", err)
 		return nil
 	}
-
 	videoDOs, err := domain.FillVideoList(ctx, videoList, userId, true)
 	if err != nil {
 		log.Println("GetFavoriteList FillVideoList Failed", err)
 		return nil
 	}
-
 	return videoDOs
 }

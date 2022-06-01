@@ -24,12 +24,10 @@ type IVideoRepository interface {
 	FindByVideoId(context.Context, int64) (*Video, error)
 	FindWithLimit(context.Context, int) ([]*Video, error)
 	FindByCreateTimeWithLimit(context.Context, int64, int) ([]*Video, error)
-	UpdadteFavoriteCount(context.Context, *Video, int64) error
 	AddVideoFavoriteCount(context.Context, int64) error
 	DeleteVideoFavoriteCount(context.Context, int64) error
 	FindByVideoIds(context.Context, []int64) ([]*Video, error)
 }
-
 type VideoRepository struct{}
 
 func (r *VideoRepository) Create(ctx context.Context, video *Video) error {
@@ -42,9 +40,10 @@ func (r *VideoRepository) FindByUserId(ctx context.Context, userId int64) ([]*Vi
 	return videos, err
 }
 
-func (r *VideoRepository) FindByVideoId(ctx context.Context, videoId int64) (video *Video, err error) {
-	err = DB.WithContext(ctx).Where("video_id = ?", videoId).First(&video).Error
-	return video, err
+func (r *VideoRepository) FindByVideoId(ctx context.Context, videoId int64) (*Video, error) {
+	video := Video{}
+	err := DB.WithContext(ctx).Where("video_id = ? and delete_time = 0", videoId).First(&video).Error
+	return &video, err
 }
 
 func (r *VideoRepository) FindWithLimit(ctx context.Context, limit int) ([]*Video, error) {
