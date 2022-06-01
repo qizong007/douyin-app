@@ -1,4 +1,4 @@
-package util
+package sensitive_filter
 
 import (
 	"github.com/go-playground/assert/v2"
