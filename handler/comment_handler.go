@@ -23,7 +23,7 @@ func CommentHandler(c *gin.Context) {
 	token := c.Query("token")
 	//解析token
 	tokenUserId, err := util.ParseToken(token)
-	if err != nil {
+	if err != nil { //ParseToken只会返回两种错误
 		if errors.Is(err, util.ErrNoAuth) {
 			log.Println("CommentHandler Token <nil>")
 			util.MakeResponse(c, &util.HttpResponse{
