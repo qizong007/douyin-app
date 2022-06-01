@@ -75,6 +75,17 @@ func CommentHandler(c *gin.Context) {
 }
 
 func PublishCommentHandler(c *gin.Context, userId int64) {
+	commentText := c.Query("comment_text")
+	//去首尾空格并限制comment_text长度
+	commentText = strings.TrimSpace(commentText)
+	if len(commentText) > MaxCommentLen {
+		log.Println("PublishCommentHandler CommentText Is Too Long ")
+		util.MakeResponse(c, &util.HttpResponse{
+			StatusCode: util.CommentTooLong,
+		})
+		return
+	}
+
 	//解析videoId
 	reqVideoId := c.Query("video_id")
 	videoId, err := util.Str2Int64(reqVideoId)
@@ -99,18 +110,6 @@ func PublishCommentHandler(c *gin.Context, userId int64) {
 		log.Println("PublishCommentHandler GetVideoRepository().FindByVideoId Failed")
 		util.MakeResponse(c, &util.HttpResponse{
 			StatusCode: util.InternalServerError,
-		})
-		return
-	}
-
-	commentText := c.Query("comment_text")
-	//去首尾空格并限制comment_text长度
-	commentText = strings.TrimSpace(commentText)
-	if len(commentText) > MaxCommentLen {
-		log.Println("PublishCommentHandler CommentText Is Too Long ")
-		util.MakeResponse(c, &util.HttpResponse{
-			StatusCode: util.ParamError,
-			StatusMsg:  " CommentText Is Too Long ",
 		})
 		return
 	}
@@ -242,7 +241,7 @@ func CommentListHandler(c *gin.Context) {
 	util.MakeResponse(c, &util.HttpResponse{
 		StatusCode: util.Success,
 		ReturnVal: map[string]interface{}{
-			"comment": &commentDOs,
+			"comment": commentDOs,
 		},
 	})
 }
