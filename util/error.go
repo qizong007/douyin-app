@@ -26,20 +26,20 @@ const (
 )
 
 var ErrCode2Msg = map[int]string{
-	Success:             "success",
-	WrongAuth:           "the token is expired or invalid",
-	NoAuth:              "token not received",
-	UserExisted:         "user already exists",
-	UserNotExist:        "username is not exist",
-	WrongPassword:       "password is wrong",
+	Success:             "请求成功",
+	WrongAuth:           "用户登录已过期（失效）",
+	NoAuth:              "权限不足",
+	UserExisted:         "用户名已存在",
+	UserNotExist:        "用户不存在",
+	WrongPassword:       "密码错误",
 	IsFollow:            "该关注记录已存在",
 	NotFollow:           "该关注记录尚未存在",
-	VideoNotExist:       "video is not exist",
-	CommentNotExist:     "commentId is not exist",
-	CommentTooLong:      "comment is too long",
-	SensitiveComment:    "Comment contains sensitive words",
-	InternalServerError: "internal server error",
-	ParamError:          "something wrong with param...",
+	VideoNotExist:       "该视频不存在",
+	CommentNotExist:     "该评论不存在",
+	CommentTooLong:      "评论过长（内容需在500个字符以内）",
+	SensitiveComment:    "评论包含敏感词汇",
+	InternalServerError: "服务器内部错误",
+	ParamError:          "参数错误",
 }
 
 var (
