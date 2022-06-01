@@ -4,7 +4,6 @@ import (
 	"context"
 	"douyin-app/repository"
 	"douyin-app/util"
-	"time"
 )
 
 type Comment struct {
@@ -42,7 +41,7 @@ func FillCommentList(ctx context.Context, comments []*repository.Comment, userId
 			Id:         comments[i].CommentId,
 			User:       authors[i],
 			Content:    comments[i].Content,
-			CreateDate: time.Unix(comments[i].CreateTime, 0).Format("2006-01-02 15:04:05")[5:10], //mm-dd
+			CreateDate: util.Timestamp2Date(comments[i].CreateTime), //mm-dd
 		}
 	}
 	return commentDOs, nil
