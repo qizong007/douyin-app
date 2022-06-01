@@ -18,6 +18,7 @@ type Video struct {
 type IVideoRepository interface {
 	Create(context.Context, *Video) error
 	FindByUserId(context.Context, int64) ([]*Video, error)
+	FindByVideoId(context.Context, int64) (*Video, error)
 	FindWithLimit(context.Context, int) ([]*Video, error)
 	FindByCreateTimeWithLimit(context.Context, int64, int) ([]*Video, error)
 }
@@ -31,6 +32,12 @@ func (r *VideoRepository) FindByUserId(ctx context.Context, userId int64) ([]*Vi
 	videos := make([]*Video, 0)
 	err := DB.WithContext(ctx).Order("create_time desc").Where("user_id = ? and delete_time = 0", userId).Find(&videos).Error
 	return videos, err
+}
+
+func (r *VideoRepository) FindByVideoId(ctx context.Context, videoId int64) (*Video, error) {
+	video := Video{}
+	err := DB.WithContext(ctx).Where("video_id = ? and delete_time = 0", videoId).First(&video).Error
+	return &video, err
 }
 
 func (r *VideoRepository) FindWithLimit(ctx context.Context, limit int) ([]*Video, error) {

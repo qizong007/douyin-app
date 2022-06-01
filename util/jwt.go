@@ -61,10 +61,10 @@ func parseToken(token string) (*MyClaims, error) {
 	return nil, errors.New("invalid tokenStruct")
 }
 
-//解析query中的token
-//token有效会返回解析出的userId,否则会返回错误
+//解析query中的token,token有效会返回解析出的userId
+//如果token为空,返回ErrNoAuth
+//如果token无效或过期,返回ErrWrongAuth
 func ParseToken(token string) (userId int64, err error) {
-
 	if token == "" {
 		return 0, ErrNoAuth
 	}
