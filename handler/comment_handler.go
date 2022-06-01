@@ -19,8 +19,8 @@ const (
 )
 
 func CommentHandler(c *gin.Context) {
+
 	token := c.Query("token")
-	actionType := c.Query("action_type")
 	//解析token
 	tokenUserId, err := util.ParseToken(token)
 	if err != nil {
@@ -60,6 +60,7 @@ func CommentHandler(c *gin.Context) {
 		return
 	}
 
+	actionType := c.Query("action_type")
 	//根据actionType做功能的拆分
 	switch actionType {
 	case PublishCommentType:
@@ -106,7 +107,6 @@ func PublishCommentHandler(c *gin.Context, userId int64) {
 			})
 			return
 		}
-
 		log.Println("PublishCommentHandler GetVideoRepository().FindByVideoId Failed")
 		util.MakeResponse(c, &util.HttpResponse{
 			StatusCode: util.InternalServerError,
@@ -140,8 +140,8 @@ func PublishCommentHandler(c *gin.Context, userId int64) {
 }
 
 func DeleteCommentHandler(c *gin.Context) {
-	reqCommentId := c.Query("comment_id")
 
+	reqCommentId := c.Query("comment_id")
 	commentId, err := util.Str2Int64(reqCommentId)
 	if err != nil {
 		log.Println("CommentHandler ParseCommentId Failed ")
@@ -222,6 +222,7 @@ func CommentListHandler(c *gin.Context) {
 			return
 		}
 	}
+
 	comments, err := repository.GetCommentRepository().FindByVideoId(c, videoId)
 	if err != nil {
 		log.Println("CommentListHandler GetCommentRepository().FindByVideoId Failed")
@@ -230,6 +231,7 @@ func CommentListHandler(c *gin.Context) {
 		})
 		return
 	}
+
 	commentDOs, err := domain.FillCommentList(c, comments, userId)
 	if err != nil {
 		log.Println("CommentListHandler domain.FillCommentList Failed")
@@ -238,6 +240,7 @@ func CommentListHandler(c *gin.Context) {
 		})
 		return
 	}
+
 	util.MakeResponse(c, &util.HttpResponse{
 		StatusCode: util.Success,
 		ReturnVal: map[string]interface{}{

@@ -31,8 +31,8 @@ func FillComment(comment *repository.Comment, user *repository.User) *Comment {
 
 func FillCommentList(ctx context.Context, comments []*repository.Comment, userId int64) ([]*Comment, error) {
 	userIds := GetUserIdsFromCommentList(comments)
-	authors, err := getAuthorsFromIds(ctx, userIds, userId)
 
+	authors, err := getAuthorsFromIds(ctx, userIds, userId)
 	if err != nil {
 		return nil, err
 	}
