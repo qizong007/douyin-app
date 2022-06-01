@@ -19,7 +19,7 @@ func main() {
 	util.InitJWTVal()
 	util.InitValidate()
 	util.InitOSSClient(conf.Config)
-	util.In
+	util.InitFilter()
 
 	r := gin.Default()
 	handler.Register(r)
