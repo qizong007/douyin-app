@@ -19,10 +19,9 @@ const (
 )
 
 func CommentHandler(c *gin.Context) {
-
 	token := c.Query("token")
 	//解析token
-	tokenUserId, err := util.ParseToken(token)
+	userId, err := util.ParseToken(token)
 	if err != nil { //ParseToken只会返回两种错误
 		if errors.Is(err, util.ErrNoAuth) {
 			log.Println("CommentHandler Token <nil>")
@@ -38,26 +37,6 @@ func CommentHandler(c *gin.Context) {
 			})
 			return
 		}
-	}
-
-	//解析UserId
-	reqUserId := c.Query("user_id")
-	userId, err := util.Str2Int64(reqUserId)
-	if err != nil {
-		log.Println("CommentHandler ParseUserId failed ")
-		util.MakeResponse(c, &util.HttpResponse{
-			StatusCode: util.ParamError,
-		})
-		return
-	}
-	//userId和Token中的UserId必须一致
-	if userId != tokenUserId {
-		log.Println("CommentHandler UserId Does Not Match Token ")
-		util.MakeResponse(c, &util.HttpResponse{
-			StatusCode: util.ParamError,
-			StatusMsg:  "UserId Does Not Match Token",
-		})
-		return
 	}
 
 	actionType := c.Query("action_type")
@@ -244,7 +223,7 @@ func CommentListHandler(c *gin.Context) {
 	util.MakeResponse(c, &util.HttpResponse{
 		StatusCode: util.Success,
 		ReturnVal: map[string]interface{}{
-			"comment": commentDOs,
+			"comment_list": commentDOs,
 		},
 	})
 }
