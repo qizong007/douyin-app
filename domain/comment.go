@@ -3,7 +3,7 @@ package domain
 import (
 	"context"
 	"douyin-app/repository"
-	"log"
+	"douyin-app/util"
 	"time"
 )
 
@@ -15,8 +15,6 @@ type Comment struct {
 }
 
 func FillComment(comment *repository.Comment, user *repository.User) *Comment {
-	timeStr := time.Unix(comment.CreateTime, 0).Format("2006-01-02 15:04:05")
-
 	return &Comment{
 		Id: comment.CommentId,
 		User: &Author{
@@ -27,15 +25,14 @@ func FillComment(comment *repository.Comment, user *repository.User) *Comment {
 			IsFollow:      true, //这里作者是自己,所以是true
 		},
 		Content:    comment.Content,
-		CreateDate: timeStr[5:10], //mm-dd
+		CreateDate: util.Timestamp2Date(comment.CreateTime), //mm-dd
 	}
 }
 
 func FillCommentList(ctx context.Context, comments []*repository.Comment, userId int64) ([]*Comment, error) {
 	userIds := GetUserIdsFromCommentList(comments)
 	authors, err := getAuthorsFromIds(ctx, userIds, userId)
-	log.Println("ids", userIds)
-	log.Println("authors", authors)
+
 	if err != nil {
 		return nil, err
 	}
