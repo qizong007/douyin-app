@@ -16,6 +16,8 @@ const (
 
 	CommentNotExist
 	CommentTooLong
+	CommentIsEmpty
+
 	SensitiveComment
 
 	IsFollow
@@ -37,6 +39,7 @@ var ErrCode2Msg = map[int]string{
 	VideoNotExist:       "该视频不存在",
 	CommentNotExist:     "该评论不存在",
 	CommentTooLong:      "评论过长（内容需在500个字符以内）",
+	CommentIsEmpty:      "评论不能为空",
 	SensitiveComment:    "评论包含敏感词汇",
 	InternalServerError: "服务器内部错误",
 	ParamError:          "参数错误",
