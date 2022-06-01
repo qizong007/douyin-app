@@ -7,9 +7,11 @@ import (
 
 var Filter *sensitive.Filter
 
+const WordDictPath = "./document/sensitive_dict.txt"
+
 func InitFilter() {
 	Filter = sensitive.New()
-	err := Filter.LoadWordDict("../document/sensitive_dict.txt")
+	err := Filter.LoadWordDict(WordDictPath)
 	if err != nil {
 		log.Println("InitFilter Fail,Err=" + err.Error())
 	}
