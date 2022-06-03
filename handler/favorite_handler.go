@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"douyin-app/domain"
 	"douyin-app/service"
 	"douyin-app/util"
 	"github.com/gin-gonic/gin"
@@ -74,8 +75,9 @@ func VideoFavoriteHandler(c *gin.Context) {
 */
 func VedioFavoriteListHandler(c *gin.Context) {
 	var (
-		userId int64
-		err    error
+		userId   int64
+		err      error
+		videoDOs []*domain.VideoDO
 	)
 
 	//token
@@ -91,11 +93,21 @@ func VedioFavoriteListHandler(c *gin.Context) {
 		}
 	}
 
+	//favoriteList
+	videoDOs, err = service.GetFavoriteList(c, userId)
+	if err != nil {
+		log.Println("VedioFavoriteListHandler GetFavoriteList Failed", err)
+		util.MakeResponse(c, &util.HttpResponse{
+			StatusCode: util.ParamError,
+		})
+		return
+	}
+
 	//response
 	util.MakeResponse(c, &util.HttpResponse{
 		StatusCode: util.Success,
 		ReturnVal: map[string]interface{}{
-			"video_list": service.GetFavoriteList(c, userId),
+			"video_list": videoDOs,
 		},
 	})
 }

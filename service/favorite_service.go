@@ -67,34 +67,38 @@ func Unlike(ctx context.Context, userId int64, videoId int64) error {
 		return err
 	}
 	//decrease video's favoriteCount
-	if err := repository.GetVideoRepository().DeleteVideoFavoriteCount(ctx, videoId); err != nil {
+	if err := repository.GetVideoRepository().ReduceVideoFavoriteCount(ctx, videoId); err != nil {
 		return err
 	}
 	return nil
 }
 
 //get favoriteList
-func GetFavoriteList(ctx context.Context, userId int64) []*domain.VideoDO {
-	favoriteList, err := repository.GetFavoriteRepository().FindVideoListByUserId(ctx, userId)
-	if err != nil {
-		log.Println("GetVideoRepository().FindVideoListByUserId Failed", err)
-		return nil
-	}
+func GetFavoriteList(ctx context.Context, userId int64) ([]*domain.VideoDO, error) {
 	var (
 		videoIdList []int64
 	)
+
+	favoriteList, err := repository.GetFavoriteRepository().FindVideoListByUserId(ctx, userId)
+	if err != nil {
+		log.Println("GetVideoRepository().FindVideoListByUserId Failed", err)
+		return nil, err
+	}
+
 	for _, x := range favoriteList {
 		videoIdList = append(videoIdList, x.VideoId)
 	}
 	videoList, err := repository.GetVideoRepository().FindByVideoIds(ctx, videoIdList)
 	if err != nil {
 		log.Println("GetFavoriteList FindByVideoIds Failed", err)
-		return nil
+		return nil, err
 	}
+
 	videoDOs, err := domain.FillVideoList(ctx, videoList, userId, true)
 	if err != nil {
 		log.Println("GetFavoriteList FillVideoList Failed", err)
-		return nil
+		return nil, err
 	}
-	return videoDOs
+
+	return videoDOs, nil
 }
