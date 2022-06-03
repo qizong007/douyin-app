@@ -31,7 +31,7 @@ func Like(ctx context.Context, userId int64, videoId int64) error {
 	//find favorite record by userId and videoId
 	favorite, err := repository.GetFavoriteRepository().FindFavoriteRecord(ctx, userId, videoId)
 	//error is not "not found" ,return err
-	if !errors.Is(err, gorm.ErrRecordNotFound) && err != nil {
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return err
 	}
 	//record not found
