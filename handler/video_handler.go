@@ -134,7 +134,8 @@ func VideoPublishedListHandler(c *gin.Context) {
 		return
 	}
 
-	videoDOs, err := domain.FillVideoList(c, videoList, loginUserId)
+	videoDOs, err := domain.FillVideoList(c, videoList, loginUserId, false)
+
 	if err != nil {
 		log.Println("FillVideoList Failed", err)
 		util.MakeResponse(c, &util.HttpResponse{
@@ -201,7 +202,7 @@ func VideoFeedHandler(c *gin.Context) {
 		}
 	}
 
-	videoDOs, err := domain.FillVideoList(c, videoList, userId)
+	videoDOs, err := domain.FillVideoList(c, videoList, userId, false)
 	if err != nil {
 		log.Println("FillVideoList Failed", err)
 		util.MakeResponse(c, &util.HttpResponse{

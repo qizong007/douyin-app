@@ -16,7 +16,7 @@ type VideoDO struct {
 	IsFavorite    bool    `json:"is_favorite"`
 }
 
-func FillVideoList(ctx context.Context, videoList []*repository.Video, audienceId int64) ([]*VideoDO, error) {
+func FillVideoList(ctx context.Context, videoList []*repository.Video, audienceId int64, isFavorite bool) ([]*VideoDO, error) {
 	res := make([]*VideoDO, len(videoList))
 
 	authorIds := GetUserIdsFromVideoList(videoList)
@@ -28,6 +28,7 @@ func FillVideoList(ctx context.Context, videoList []*repository.Video, audienceI
 	// TODO audienceId 用来查关注和点赞
 
 	for i := range videoList {
+		//isFavorite := flag
 		res[i] = &VideoDO{
 			Id:            videoList[i].VideoId,
 			Author:        authors[i],
@@ -36,7 +37,7 @@ func FillVideoList(ctx context.Context, videoList []*repository.Video, audienceI
 			Title:         videoList[i].Title,
 			FavoriteCount: videoList[i].FavoriteCount, //TODO
 			CommentCount:  videoList[i].CommentCount,  //TODO
-			IsFavorite:    false,                      //TODO
+			IsFavorite:    isFavorite,                 //TODO
 		}
 	}
 

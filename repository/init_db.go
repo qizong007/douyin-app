@@ -55,6 +55,7 @@ func initMySQL() {
 var (
 	userRepo    IUserRepository
 	videoRepo   IVideoRepository
+	favorite    IFavoriteRepository
 	followRepo  IFollowRepository
 	commentRepo ICommentRepository
 )
@@ -62,6 +63,7 @@ var (
 func initRepository() {
 	userRepo = &UserRepository{}
 	videoRepo = &VideoRepository{}
+	favorite = &FavoriteRepository{}
 	followRepo = &FollowRepository{}
 	commentRepo = &CommentRepository{}
 }
@@ -72,6 +74,10 @@ func GetUserRepository() IUserRepository {
 
 func GetVideoRepository() IVideoRepository {
 	return videoRepo
+}
+
+func GetFavoriteRepository() IFavoriteRepository {
+	return favorite
 }
 
 func GetFollowRepository() IFollowRepository {

@@ -6,9 +6,9 @@ redis:
   db:       0   #use default DB
 mysql:
   username: "root"
-  password: "111111"
-  addr: "127.0.0.1:3306"
-  database: "douyin_app"
+  password: "123456"
+  addr: "127.0.0.0:1316"
+  database: "tiktok"
 jwt:
   token_expire_duration: 240    #hour
   secrect: "天王盖地虎"           #token服务端秘钥
@@ -19,3 +19,5 @@ oss:
   bucket_name: "dyin-app"
 server:
   port: ":8866"
+
+
