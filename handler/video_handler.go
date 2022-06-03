@@ -152,7 +152,6 @@ func VideoPublishedListHandler(c *gin.Context) {
 	})
 }
 
-//***********
 func VideoFeedHandler(c *gin.Context) {
 	var (
 		userId    int64

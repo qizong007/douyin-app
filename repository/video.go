@@ -25,7 +25,7 @@ type IVideoRepository interface {
 	FindWithLimit(context.Context, int) ([]*Video, error)
 	FindByCreateTimeWithLimit(context.Context, int64, int) ([]*Video, error)
 	AddVideoFavoriteCount(context.Context, int64) error
-	DeleteVideoFavoriteCount(context.Context, int64) error
+	ReduceVideoFavoriteCount(context.Context, int64) error
 	FindByVideoIds(context.Context, []int64) ([]*Video, error)
 }
 type VideoRepository struct{}
@@ -68,7 +68,7 @@ func (r *VideoRepository) AddVideoFavoriteCount(ctx context.Context, videoId int
 		UpdateColumn("favorite_count", gorm.Expr("favorite_count + 1")).Error
 }
 
-func (r *VideoRepository) DeleteVideoFavoriteCount(ctx context.Context, videoId int64) error {
+func (r *VideoRepository) ReduceVideoFavoriteCount(ctx context.Context, videoId int64) error {
 	return DB.WithContext(ctx).Model(&Video{}).Where("video_id = ?", videoId).
 		UpdateColumn("favorite_count", gorm.Expr("favorite_count - 1")).Error
 }
