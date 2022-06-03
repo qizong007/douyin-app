@@ -73,9 +73,9 @@ func (r *VideoRepository) ReduceVideoFavoriteCount(ctx context.Context, videoId 
 		UpdateColumn("favorite_count", gorm.Expr("favorite_count - 1")).Error
 }
 
-func (r *VideoRepository) FindByVideoIds(ctx context.Context, VideoList []int64) ([]*Video, error) {
+func (r *VideoRepository) FindByVideoIds(ctx context.Context, videoList []int64) ([]*Video, error) {
 	videos := make([]*Video, 0)
-	err := DB.WithContext(ctx).Model(&Video{}).Where("video_id in (?) and delete_time = 0", VideoList).Find(&videos).Error
+	err := DB.WithContext(ctx).Model(&Video{}).Where("video_id in (?) and delete_time = 0", videoList).Find(&videos).Error
 	if err != nil {
 		return nil, err
 	}

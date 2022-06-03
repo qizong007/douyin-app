@@ -28,10 +28,10 @@ func FavoriteAction(c *gin.Context, userId int64, videoId int64, actionType stri
 
 //Like
 func Like(ctx context.Context, userId int64, videoId int64) error {
-	//find favorite record by userId and VideoId
+	//find favorite record by userId and videoId
 	favorite, err := repository.GetFavoriteRepository().FindFavoriteRecord(ctx, userId, videoId)
 	//error is not "not found" ,return err
-	if !errors.Is(err, gorm.ErrRecordNotFound) {
+	if !errors.Is(err, gorm.ErrRecordNotFound) && err != nil {
 		return err
 	}
 	//record not found
