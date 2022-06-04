@@ -2,6 +2,7 @@ package handler
 
 import (
 	"douyin-app/domain"
+	"douyin-app/middleware"
 	"douyin-app/service"
 	"douyin-app/util"
 	"github.com/gin-gonic/gin"
@@ -10,7 +11,7 @@ import (
 
 /*
 	点赞操作：
-		1： 点赞，直接在favorite表创建 userid与favoriteId进行关联的数据，同时更新video表中 FavoriteCount 属性值
+		1： 点赞，直接在favorite表创建 userId与favoriteId进行关联的数据，同时更新video表中 FavoriteCount 属性值
 		2： 取消点赞，直接删除favorite表中这条记录，同时更新video表中 FavoriteCount 属性值
 
 	actionTYpe == 1 点赞
@@ -19,26 +20,15 @@ import (
 		1) delete_time = now()
 */
 func VideoFavoriteHandler(c *gin.Context) {
-	//token
-	token := c.Query("token")
-	if token == "" {
-		log.Println("VideoFavoriteHandler Token <nil>")
-		util.MakeResponse(c, &util.HttpResponse{
-			StatusCode: util.WrongAuth,
-		})
-		return
-	}
-
-	//userId
-	userId, err := util.ParseToken(token)
+	//获取从JWTMiddleware解析好的userId
+	userId, err := middleware.GetUserId(c)
 	if err != nil {
-		log.Println("VideoFavoriteHandler ParseToken Failed", err)
+		log.Println(err)
 		util.MakeResponse(c, &util.HttpResponse{
-			StatusCode: util.WrongAuth,
+			StatusCode: util.InternalServerError,
 		})
 		return
 	}
-
 	//videoId
 	vid, err := util.Str2Int64(c.Query("video_id"))
 	if err != nil {
@@ -70,7 +60,7 @@ func VideoFavoriteHandler(c *gin.Context) {
 
 /*
 	返回点赞list
- 	1. 从favorite表中找出 userid= ?? 符合所有的favorite记录存储在favoriteList中
+ 	1. 从favorite表中找出 userId= ?? 符合所有的favorite记录存储在favoriteList中
 	2. 遍历favoriteList得到videoList
 */
 func VideoFavoriteListHandler(c *gin.Context) {
@@ -80,23 +70,19 @@ func VideoFavoriteListHandler(c *gin.Context) {
 		videoDOs []*domain.VideoDO
 	)
 
-	//token
-	token := c.Query("token")
-	if token != "" {
-		userId, err = util.ParseToken(token)
-		if err != nil {
-			log.Println("VedioFavoriteListHandler ParseToken Failed", err)
-			util.MakeResponse(c, &util.HttpResponse{
-				StatusCode: util.WrongAuth,
-			})
-			return
-		}
+	//获取从JWTMiddleware解析好的userId
+	userId, err = middleware.GetUserId(c)
+	if err != nil {
+		log.Println(err)
+		util.MakeResponse(c, &util.HttpResponse{
+			StatusCode: util.InternalServerError,
+		})
+		return
 	}
-
 	//favoriteList
 	videoDOs, err = service.GetFavoriteList(c, userId)
 	if err != nil {
-		log.Println("VedioFavoriteListHandler GetFavoriteList Failed", err)
+		log.Println("VideoFavoriteListHandler GetFavoriteList Failed", err)
 		util.MakeResponse(c, &util.HttpResponse{
 			StatusCode: util.ParamError,
 		})

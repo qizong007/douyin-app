@@ -2,6 +2,7 @@ package handler
 
 import (
 	"douyin-app/domain"
+	"douyin-app/middleware"
 	"douyin-app/repository"
 	"douyin-app/service"
 	"douyin-app/util"
@@ -98,20 +99,12 @@ func LoginHandler(c *gin.Context) {
 }
 
 func GetUserInfoHandler(c *gin.Context) {
-	token := c.Query("token")
-	if token == "" {
-		log.Println("GetUserInfoHandler Token <nil>")
-		util.MakeResponse(c, &util.HttpResponse{
-			StatusCode: util.ParamError,
-		})
-		return
-	}
-
-	loginUserId, err := util.ParseToken(token)
+	//获取从JWTMiddleware解析好的userId
+	loginUserId, err := middleware.GetUserId(c)
 	if err != nil {
-		log.Println("GetUserInfoHandler ParseToken Failed", err)
+		log.Println(err)
 		util.MakeResponse(c, &util.HttpResponse{
-			StatusCode: util.WrongAuth,
+			StatusCode: util.InternalServerError,
 		})
 		return
 	}

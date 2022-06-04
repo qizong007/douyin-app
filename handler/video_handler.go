@@ -2,6 +2,7 @@ package handler
 
 import (
 	"douyin-app/domain"
+	"douyin-app/middleware"
 	"douyin-app/repository"
 	"douyin-app/service"
 	"douyin-app/util"
@@ -16,11 +17,12 @@ const (
 )
 
 func VideoPublishHandler(c *gin.Context) {
-	token := c.PostForm("token")
-	if token == "" {
-		log.Println("VideoPublishHandler Token <nil>")
+	//获取从JWTMiddleware解析好的userId
+	userId, err := middleware.GetUserId(c)
+	if err != nil {
+		log.Println(err)
 		util.MakeResponse(c, &util.HttpResponse{
-			StatusCode: util.ParamError,
+			StatusCode: util.InternalServerError,
 		})
 		return
 	}
@@ -30,15 +32,6 @@ func VideoPublishHandler(c *gin.Context) {
 		log.Println("VideoPublishHandler Title <nil>")
 		util.MakeResponse(c, &util.HttpResponse{
 			StatusCode: util.ParamError,
-		})
-		return
-	}
-
-	userId, err := util.ParseToken(token)
-	if err != nil {
-		log.Println("VideoPublishHandler ParseToken Failed", err)
-		util.MakeResponse(c, &util.HttpResponse{
-			StatusCode: util.WrongAuth,
 		})
 		return
 	}
@@ -97,20 +90,12 @@ func VideoPublishHandler(c *gin.Context) {
 }
 
 func VideoPublishedListHandler(c *gin.Context) {
-	token := c.Query("token")
-	if token == "" {
-		log.Println("VideoPublishedListHandler Token <nil>")
-		util.MakeResponse(c, &util.HttpResponse{
-			StatusCode: util.ParamError,
-		})
-		return
-	}
-
-	loginUserId, err := util.ParseToken(token)
+	//获取从JWTMiddleware解析好的userId
+	loginUserId, err := middleware.GetUserId(c)
 	if err != nil {
-		log.Println("VideoPublishedListHandler ParseToken Failed", err)
+		log.Println(err)
 		util.MakeResponse(c, &util.HttpResponse{
-			StatusCode: util.WrongAuth,
+			StatusCode: util.InternalServerError,
 		})
 		return
 	}
@@ -159,18 +144,16 @@ func VideoFeedHandler(c *gin.Context) {
 		videoList []*repository.Video
 	)
 
-	token := c.Query("token")
 	latestTimeStr := c.Query("latest_time")
 
-	if token != "" {
-		userId, err = util.ParseToken(token)
-		if err != nil {
-			log.Println("VideoPublishHandler ParseToken Failed", err)
-			util.MakeResponse(c, &util.HttpResponse{
-				StatusCode: util.WrongAuth,
-			})
-			return
-		}
+	//获取从JWTMiddleware解析好的userId
+	userId, err = middleware.GetUserId(c)
+	if err != nil {
+		log.Println(err)
+		util.MakeResponse(c, &util.HttpResponse{
+			StatusCode: util.InternalServerError,
+		})
+		return
 	}
 
 	if latestTimeStr == "" { // 没有传入 latest_time

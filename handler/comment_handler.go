@@ -2,6 +2,7 @@ package handler
 
 import (
 	"douyin-app/domain"
+	"douyin-app/middleware"
 	"douyin-app/repository"
 	"douyin-app/service"
 	"douyin-app/util"
@@ -19,24 +20,14 @@ const (
 )
 
 func CommentHandler(c *gin.Context) {
-	token := c.Query("token")
-	//解析token
-	userId, err := util.ParseToken(token)
-	if err != nil { //ParseToken只会返回两种错误
-		if errors.Is(err, util.ErrNoAuth) {
-			log.Println("CommentHandler Token <nil>")
-			util.MakeResponse(c, &util.HttpResponse{
-				StatusCode: util.NoAuth,
-			})
-			return
-		}
-		if errors.Is(err, util.ErrWrongAuth) {
-			log.Println("CommentHandler Token Wrong Err=")
-			util.MakeResponse(c, &util.HttpResponse{
-				StatusCode: util.WrongAuth,
-			})
-			return
-		}
+	//获取从JWTMiddleware解析好的userId
+	userId, err := middleware.GetUserId(c)
+	if err != nil {
+		log.Println(err)
+		util.MakeResponse(c, &util.HttpResponse{
+			StatusCode: util.InternalServerError,
+		})
+		return
 	}
 
 	actionType := c.Query("action_type")
@@ -162,26 +153,15 @@ func DeleteCommentHandler(c *gin.Context) {
 }
 
 func CommentListHandler(c *gin.Context) {
-	token := c.Query("token")
-	//解析token
-	userId, err := util.ParseToken(token)
-	if err != nil { //ParseToken只会返回两种错误
-		if errors.Is(err, util.ErrNoAuth) {
-			log.Println("CommentHandler Token <nil>")
-			util.MakeResponse(c, &util.HttpResponse{
-				StatusCode: util.NoAuth,
-			})
-			return
-		}
-		if errors.Is(err, util.ErrWrongAuth) {
-			log.Println("CommentHandler Token Wrong")
-			util.MakeResponse(c, &util.HttpResponse{
-				StatusCode: util.WrongAuth,
-			})
-			return
-		}
+	//获取从JWTMiddleware解析好的userId
+	userId, err := middleware.GetUserId(c)
+	if err != nil {
+		log.Println(err)
+		util.MakeResponse(c, &util.HttpResponse{
+			StatusCode: util.InternalServerError,
+		})
+		return
 	}
-
 	reqVideoId := c.Query("video_id")
 	videoId, err := util.Str2Int64(reqVideoId)
 	if err != nil {

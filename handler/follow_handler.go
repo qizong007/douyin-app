@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"douyin-app/middleware"
 	"douyin-app/service"
 	"douyin-app/util"
 	"github.com/gin-gonic/gin"
@@ -15,14 +16,15 @@ type RelationReq struct {
 
 func FollowActionHandler(c *gin.Context) {
 	var req RelationReq
-	token := c.Query("token")
 	req.ToUserID, _ = util.Str2Int64(c.Query("to_user_id"))
 	req.ActionType = c.Query("action_type")
-	userId, err := util.ParseToken(token)
+
+	//获取从JWTMiddleware解析好的userId
+	userId, err := middleware.GetUserId(c)
 	if err != nil {
-		log.Println("RelationHandler ParseToken Failed", err)
+		log.Println(err)
 		util.MakeResponse(c, &util.HttpResponse{
-			StatusCode: util.WrongAuth,
+			StatusCode: util.InternalServerError,
 		})
 		return
 	}
@@ -43,12 +45,12 @@ func FollowActionHandler(c *gin.Context) {
 }
 
 func GetFollowListHandler(c *gin.Context) {
-	token := c.Query("token")
-	userId, err := util.ParseToken(token)
+	//获取从JWTMiddleware解析好的userId
+	userId, err := middleware.GetUserId(c)
 	if err != nil {
-		log.Println("RelationHandler ParseToken Failed", err)
+		log.Println(err)
 		util.MakeResponse(c, &util.HttpResponse{
-			StatusCode: util.WrongAuth,
+			StatusCode: util.InternalServerError,
 		})
 		return
 	}
@@ -62,16 +64,15 @@ func GetFollowListHandler(c *gin.Context) {
 }
 
 func GetFollowerListHandler(c *gin.Context) {
-	token := c.Query("token")
-	userId, err := util.ParseToken(token)
+	//获取从JWTMiddleware解析好的userId
+	userId, err := middleware.GetUserId(c)
 	if err != nil {
-		log.Println("RelationHandler ParseToken Failed", err)
+		log.Println(err)
 		util.MakeResponse(c, &util.HttpResponse{
-			StatusCode: util.WrongAuth,
+			StatusCode: util.InternalServerError,
 		})
 		return
 	}
-
 	util.MakeResponse(c, &util.HttpResponse{
 		StatusCode: util.Success,
 		ReturnVal: map[string]interface{}{
