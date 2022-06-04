@@ -8,35 +8,32 @@ import (
 func Register(r *gin.Engine) {
 	r.GET("ping", Ping)
 
-	// user
-	userRouters := r.Group("/douyin/user")
-	userRouters.POST("/register/", RegisterHandler)
-	userRouters.POST("/login/", LoginHandler)
+	r.GET("/douyin/user/", GetUserInfoHandler)
 
-	//userInfo
-	r.GET("/douyin/user/", GetUserInfoHandler).Use(middleware.JWT)
+	r.GET("/douyin/feed/", VideoFeedHandler)
 
-	// video
-	publishRouters := r.Group("/douyin/publish").Use(middleware.JWT)
-	publishRouters.POST("/action/", VideoPublishHandler)
-	publishRouters.GET("/list/", VideoPublishedListHandler)
+	{
+		r.Use(middleware.JWT)
+		// user
+		r.POST("/douyin/user/register/", RegisterHandler)
+		r.POST("/douyin/user/login/", LoginHandler)
 
-	// feed
-	r.GET("/douyin/feed/", VideoFeedHandler).Use(middleware.JWT)
+		// video
+		r.POST("/douyin/publish/action/", VideoPublishHandler)
+		r.GET("/douyin/publish/list/", VideoPublishedListHandler)
 
-	// favorite
-	favoriteRouters := r.Group("/douyin/favorite").Use(middleware.JWT)
-	favoriteRouters.POST("/action/", VideoFavoriteHandler)
-	favoriteRouters.GET("/list/", VedioFavoriteListHandler)
+		// favorite
+		r.POST("/douyin/favorite/action/", VideoFavoriteHandler)
+		r.GET("/douyin/favorite/list/", VedioFavoriteListHandler)
 
-	// relation
-	relationRouters := r.Group("/douyin/relation").Use(middleware.JWT)
-	relationRouters.POST("/action/", FollowActionHandler)
-	relationRouters.GET("/follow/list/", GetFollowListHandler)
-	relationRouters.GET("/follower/list/", GetFollowerListHandler)
+		// relation
+		r.POST("douyin/relation/action/", FollowActionHandler)
+		r.GET("douyin/relation/follow/list/", GetFollowListHandler)
+		r.GET("douyin/relation/follower/list/", GetFollowerListHandler)
 
-	// comment
-	commentRouters := r.Group("/douyin/comment").Use(middleware.JWT)
-	commentRouters.POST("/action/", CommentHandler)
-	commentRouters.GET("/list/", CommentListHandler)
+		// comment
+		r.POST("/douyin/comment/action/", CommentHandler)
+		r.GET("/douyin/comment/list/", CommentListHandler)
+	}
+
 }
