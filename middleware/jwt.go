@@ -35,11 +35,11 @@ func JWT(c *gin.Context) {
 }
 
 //获取JWT middleware解析过出的userId,
-//未经过JWT middleware解析时被调用,会返回0
-func GetUserId(ctx *gin.Context) int64 {
+//未经过JWT middleware解析时被调用,会返回错误
+func GetUserId(ctx *gin.Context) (int64, error) {
 	userId, exists := ctx.Get("userId")
 	if exists {
-		return userId.(int64)
+		return userId.(int64), nil
 	}
-	return 0
+	return 0, errors.New("UserId Not Set In Middleware")
 }

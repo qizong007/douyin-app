@@ -21,8 +21,14 @@ import (
 */
 func VideoFavoriteHandler(c *gin.Context) {
 	//获取从JWTMiddleware解析好的userId
-	userId := middleware.GetUserId(c)
-
+	userId, err := middleware.GetUserId(c)
+	if err != nil {
+		log.Println(err)
+		util.MakeResponse(c, &util.HttpResponse{
+			StatusCode: util.InternalServerError,
+		})
+		return
+	}
 	//videoId
 	vid, err := util.Str2Int64(c.Query("video_id"))
 	if err != nil {
@@ -65,8 +71,14 @@ func VideoFavoriteListHandler(c *gin.Context) {
 	)
 
 	//获取从JWTMiddleware解析好的userId
-	userId = middleware.GetUserId(c)
-
+	userId, err = middleware.GetUserId(c)
+	if err != nil {
+		log.Println(err)
+		util.MakeResponse(c, &util.HttpResponse{
+			StatusCode: util.InternalServerError,
+		})
+		return
+	}
 	//favoriteList
 	videoDOs, err = service.GetFavoriteList(c, userId)
 	if err != nil {

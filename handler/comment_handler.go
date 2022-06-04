@@ -21,7 +21,14 @@ const (
 
 func CommentHandler(c *gin.Context) {
 	//获取从JWTMiddleware解析好的userId
-	userId := middleware.GetUserId(c)
+	userId, err := middleware.GetUserId(c)
+	if err != nil {
+		log.Println(err)
+		util.MakeResponse(c, &util.HttpResponse{
+			StatusCode: util.InternalServerError,
+		})
+		return
+	}
 
 	actionType := c.Query("action_type")
 	//根据actionType做功能的拆分
@@ -147,8 +154,14 @@ func DeleteCommentHandler(c *gin.Context) {
 
 func CommentListHandler(c *gin.Context) {
 	//获取从JWTMiddleware解析好的userId
-	userId := middleware.GetUserId(c)
-
+	userId, err := middleware.GetUserId(c)
+	if err != nil {
+		log.Println(err)
+		util.MakeResponse(c, &util.HttpResponse{
+			StatusCode: util.InternalServerError,
+		})
+		return
+	}
 	reqVideoId := c.Query("video_id")
 	videoId, err := util.Str2Int64(reqVideoId)
 	if err != nil {

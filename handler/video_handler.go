@@ -18,7 +18,14 @@ const (
 
 func VideoPublishHandler(c *gin.Context) {
 	//获取从JWTMiddleware解析好的userId
-	userId := middleware.GetUserId(c)
+	userId, err := middleware.GetUserId(c)
+	if err != nil {
+		log.Println(err)
+		util.MakeResponse(c, &util.HttpResponse{
+			StatusCode: util.InternalServerError,
+		})
+		return
+	}
 
 	title := c.PostForm("title")
 	if title == "" {
@@ -84,7 +91,14 @@ func VideoPublishHandler(c *gin.Context) {
 
 func VideoPublishedListHandler(c *gin.Context) {
 	//获取从JWTMiddleware解析好的userId
-	loginUserId := middleware.GetUserId(c)
+	loginUserId, err := middleware.GetUserId(c)
+	if err != nil {
+		log.Println(err)
+		util.MakeResponse(c, &util.HttpResponse{
+			StatusCode: util.InternalServerError,
+		})
+		return
+	}
 
 	userIdStr := c.Query("user_id")
 	userId, err := util.Str2Int64(userIdStr)
@@ -133,7 +147,14 @@ func VideoFeedHandler(c *gin.Context) {
 	latestTimeStr := c.Query("latest_time")
 
 	//获取从JWTMiddleware解析好的userId
-	userId = middleware.GetUserId(c)
+	userId, err = middleware.GetUserId(c)
+	if err != nil {
+		log.Println(err)
+		util.MakeResponse(c, &util.HttpResponse{
+			StatusCode: util.InternalServerError,
+		})
+		return
+	}
 
 	if latestTimeStr == "" { // 没有传入 latest_time
 		videoList, err = repository.GetVideoRepository().FindWithLimit(c, FeedLimit)

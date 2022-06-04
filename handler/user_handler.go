@@ -100,7 +100,14 @@ func LoginHandler(c *gin.Context) {
 
 func GetUserInfoHandler(c *gin.Context) {
 	//获取从JWTMiddleware解析好的userId
-	loginUserId := middleware.GetUserId(c)
+	loginUserId, err := middleware.GetUserId(c)
+	if err != nil {
+		log.Println(err)
+		util.MakeResponse(c, &util.HttpResponse{
+			StatusCode: util.InternalServerError,
+		})
+		return
+	}
 
 	userIdStr := c.Query("user_id")
 	userId, err := util.Str2Int64(userIdStr)

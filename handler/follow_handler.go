@@ -20,10 +20,16 @@ func FollowActionHandler(c *gin.Context) {
 	req.ActionType = c.Query("action_type")
 
 	//获取从JWTMiddleware解析好的userId
-	userId := middleware.GetUserId(c)
-
+	userId, err := middleware.GetUserId(c)
+	if err != nil {
+		log.Println(err)
+		util.MakeResponse(c, &util.HttpResponse{
+			StatusCode: util.InternalServerError,
+		})
+		return
+	}
 	req.UserID = userId // 客户端的请求里没有接口文档里说的userId，直接通过token解析
-	err := service.RelationAction(c, req.UserID, req.ToUserID, req.ActionType)
+	err = service.RelationAction(c, req.UserID, req.ToUserID, req.ActionType)
 	if err != nil {
 		log.Println("RelationAction() Failed", err)
 		util.MakeResponse(c, &util.HttpResponse{
@@ -40,7 +46,14 @@ func FollowActionHandler(c *gin.Context) {
 
 func GetFollowListHandler(c *gin.Context) {
 	//获取从JWTMiddleware解析好的userId
-	userId := middleware.GetUserId(c)
+	userId, err := middleware.GetUserId(c)
+	if err != nil {
+		log.Println(err)
+		util.MakeResponse(c, &util.HttpResponse{
+			StatusCode: util.InternalServerError,
+		})
+		return
+	}
 
 	util.MakeResponse(c, &util.HttpResponse{
 		StatusCode: util.Success,
@@ -52,8 +65,14 @@ func GetFollowListHandler(c *gin.Context) {
 
 func GetFollowerListHandler(c *gin.Context) {
 	//获取从JWTMiddleware解析好的userId
-	userId := middleware.GetUserId(c)
-
+	userId, err := middleware.GetUserId(c)
+	if err != nil {
+		log.Println(err)
+		util.MakeResponse(c, &util.HttpResponse{
+			StatusCode: util.InternalServerError,
+		})
+		return
+	}
 	util.MakeResponse(c, &util.HttpResponse{
 		StatusCode: util.Success,
 		ReturnVal: map[string]interface{}{
