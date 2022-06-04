@@ -2,6 +2,7 @@ package handler
 
 import (
 	"douyin-app/domain"
+	"douyin-app/middleware"
 	"douyin-app/repository"
 	"douyin-app/service"
 	"douyin-app/util"
@@ -17,8 +18,7 @@ const (
 
 func VideoPublishHandler(c *gin.Context) {
 	//获取从JWTMiddleware解析好的userId
-	v, _ := c.Get("userId")
-	userId := v.(int64)
+	userId := middleware.GetUserId(c)
 
 	title := c.PostForm("title")
 	if title == "" {
@@ -84,8 +84,7 @@ func VideoPublishHandler(c *gin.Context) {
 
 func VideoPublishedListHandler(c *gin.Context) {
 	//获取从JWTMiddleware解析好的userId
-	v, _ := c.Get("userId")
-	loginUserId := v.(int64)
+	loginUserId := middleware.GetUserId(c)
 
 	userIdStr := c.Query("user_id")
 	userId, err := util.Str2Int64(userIdStr)
@@ -134,8 +133,7 @@ func VideoFeedHandler(c *gin.Context) {
 	latestTimeStr := c.Query("latest_time")
 
 	//获取从JWTMiddleware解析好的userId
-	v, _ := c.Get("userId")
-	userId = v.(int64)
+	userId = middleware.GetUserId(c)
 
 	if latestTimeStr == "" { // 没有传入 latest_time
 		videoList, err = repository.GetVideoRepository().FindWithLimit(c, FeedLimit)

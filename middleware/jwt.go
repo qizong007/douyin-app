@@ -33,3 +33,8 @@ func JWT(c *gin.Context) {
 	c.Set("userId", userId)
 	c.Next()
 }
+
+func GetUserId(ctx *gin.Context) int64 {
+	u, _ := ctx.Get("userId")
+	return u.(int64)
+}

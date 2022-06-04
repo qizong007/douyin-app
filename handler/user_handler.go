@@ -2,6 +2,7 @@ package handler
 
 import (
 	"douyin-app/domain"
+	"douyin-app/middleware"
 	"douyin-app/repository"
 	"douyin-app/service"
 	"douyin-app/util"
@@ -99,8 +100,7 @@ func LoginHandler(c *gin.Context) {
 
 func GetUserInfoHandler(c *gin.Context) {
 	//获取从JWTMiddleware解析好的userId
-	v, _ := c.Get("userId")
-	loginUserId := v.(int64)
+	loginUserId := middleware.GetUserId(c)
 
 	userIdStr := c.Query("user_id")
 	userId, err := util.Str2Int64(userIdStr)

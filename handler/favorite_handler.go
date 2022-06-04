@@ -2,6 +2,7 @@ package handler
 
 import (
 	"douyin-app/domain"
+	"douyin-app/middleware"
 	"douyin-app/service"
 	"douyin-app/util"
 	"github.com/gin-gonic/gin"
@@ -20,8 +21,7 @@ import (
 */
 func VideoFavoriteHandler(c *gin.Context) {
 	//获取从JWTMiddleware解析好的userId
-	v, _ := c.Get("userId")
-	userId := v.(int64)
+	userId := middleware.GetUserId(c)
 
 	//videoId
 	vid, err := util.Str2Int64(c.Query("video_id"))
@@ -65,8 +65,7 @@ func VedioFavoriteListHandler(c *gin.Context) {
 	)
 
 	//获取从JWTMiddleware解析好的userId
-	v, _ := c.Get("userId")
-	userId = v.(int64)
+	userId = middleware.GetUserId(c)
 
 	//favoriteList
 	videoDOs, err = service.GetFavoriteList(c, userId)
