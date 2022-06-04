@@ -11,7 +11,7 @@ import (
 
 /*
 	点赞操作：
-		1： 点赞，直接在favorite表创建 userid与favoriteId进行关联的数据，同时更新video表中 FavoriteCount 属性值
+		1： 点赞，直接在favorite表创建 userId与favoriteId进行关联的数据，同时更新video表中 FavoriteCount 属性值
 		2： 取消点赞，直接删除favorite表中这条记录，同时更新video表中 FavoriteCount 属性值
 
 	actionTYpe == 1 点赞
@@ -54,7 +54,7 @@ func VideoFavoriteHandler(c *gin.Context) {
 
 /*
 	返回点赞list
- 	1. 从favorite表中找出 userid= ?? 符合所有的favorite记录存储在favoriteList中
+ 	1. 从favorite表中找出 userId= ?? 符合所有的favorite记录存储在favoriteList中
 	2. 遍历favoriteList得到videoList
 */
 func VideoFavoriteListHandler(c *gin.Context) {
@@ -70,7 +70,7 @@ func VideoFavoriteListHandler(c *gin.Context) {
 	//favoriteList
 	videoDOs, err = service.GetFavoriteList(c, userId)
 	if err != nil {
-		log.Println("VedioFavoriteListHandler GetFavoriteList Failed", err)
+		log.Println("VideoFavoriteListHandler GetFavoriteList Failed", err)
 		util.MakeResponse(c, &util.HttpResponse{
 			StatusCode: util.ParamError,
 		})

@@ -23,7 +23,7 @@ func FavoriteAction(c *gin.Context, userId int64, videoId int64, actionType stri
 	case unLikeAction:
 		return Unlike(c, userId, videoId)
 	}
-	return ParamError
+	return util.ErrParamError
 }
 
 //Like

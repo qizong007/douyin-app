@@ -53,4 +53,5 @@ var (
 	ErrIsFollow         = errors.New(ErrCode2Msg[IsFollow])
 	ErrNotFollow        = errors.New(ErrCode2Msg[NotFollow])
 	ErrSensitiveComment = errors.New(ErrCode2Msg[SensitiveComment])
+	ErrParamError       = errors.New(ErrCode2Msg[ParamError])
 )
