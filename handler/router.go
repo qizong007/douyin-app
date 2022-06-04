@@ -24,7 +24,7 @@ func Register(r *gin.Engine) {
 
 		// favorite
 		r.POST("/douyin/favorite/action/", VideoFavoriteHandler)
-		r.GET("/douyin/favorite/list/", VedioFavoriteListHandler)
+		r.GET("/douyin/favorite/list/", VideoFavoriteListHandler)
 
 		// relation
 		r.POST("douyin/relation/action/", FollowActionHandler)
