@@ -1,31 +1,42 @@
 package handler
 
-import "github.com/gin-gonic/gin"
+import (
+	"douyin-app/middleware"
+	"github.com/gin-gonic/gin"
+)
 
 func Register(r *gin.Engine) {
 	r.GET("ping", Ping)
 
 	// user
-	r.POST("/douyin/user/register/", RegisterHandler)
-	r.POST("/douyin/user/login/", LoginHandler)
-	r.GET("/douyin/user/", GetUserInfoHandler)
+	userRouters := r.Group("/douyin/user")
+	userRouters.POST("/register/", RegisterHandler)
+	userRouters.POST("/login/", LoginHandler)
+
+	//userInfo
+	r.GET("/douyin/user/", GetUserInfoHandler).Use(middleware.JWT)
 
 	// video
-	r.POST("/douyin/publish/action/", VideoPublishHandler)
-	r.GET("/douyin/publish/list/", VideoPublishedListHandler)
-	r.GET("/douyin/feed/", VideoFeedHandler)
+	publishRouters := r.Group("/douyin/publish").Use(middleware.JWT)
+	publishRouters.POST("/action/", VideoPublishHandler)
+	publishRouters.GET("/list/", VideoPublishedListHandler)
 
-	//r.POST("")
+	// feed
+	r.GET("/douyin/feed/", VideoFeedHandler).Use(middleware.JWT)
+
 	// favorite
-	r.POST("/douyin/favorite/action/", VideoFavoriteHandler)
-	r.GET("/douyin/favorite/list/", VedioFavoriteListHandler)
+	favoriteRouters := r.Group("/douyin/favorite").Use(middleware.JWT)
+	favoriteRouters.POST("/action/", VideoFavoriteHandler)
+	favoriteRouters.GET("/list/", VedioFavoriteListHandler)
 
 	// relation
-	r.POST("douyin/relation/action/", FollowActionHandler)
-	r.GET("douyin/relation/follow/list/", GetFollowListHandler)
-	r.GET("douyin/relation/follower/list/", GetFollowerListHandler)
+	relationRouters := r.Group("/douyin/relation").Use(middleware.JWT)
+	relationRouters.POST("/action/", FollowActionHandler)
+	relationRouters.GET("/follow/list/", GetFollowListHandler)
+	relationRouters.GET("/follower/list/", GetFollowerListHandler)
 
 	// comment
-	r.POST("/douyin/comment/action/", CommentHandler)
-	r.GET("/douyin/comment/list/", CommentListHandler)
+	commentRouters := r.Group("/douyin/comment").Use(middleware.JWT)
+	commentRouters.POST("/action/", CommentHandler)
+	commentRouters.GET("/list/", CommentListHandler)
 }
