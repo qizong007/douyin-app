@@ -34,7 +34,12 @@ func JWT(c *gin.Context) {
 	c.Next()
 }
 
+//获取JWT middleware解析过出的userId,
+//未经过JWT middleware解析时被调用,会返回0
 func GetUserId(ctx *gin.Context) int64 {
-	u, _ := ctx.Get("userId")
-	return u.(int64)
+	userId, exists := ctx.Get("userId")
+	if exists {
+		return userId.(int64)
+	}
+	return 0
 }
