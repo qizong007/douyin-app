@@ -12,8 +12,8 @@ func Register(r *gin.Engine) {
 
 	r.GET("/douyin/feed/", VideoFeedHandler)
 
+	r.Use(middleware.JWT)
 	{
-		r.Use(middleware.JWT)
 		// user
 		r.POST("/douyin/user/register/", RegisterHandler)
 		r.POST("/douyin/user/login/", LoginHandler)
