@@ -19,25 +19,9 @@ const (
 )
 
 func CommentHandler(c *gin.Context) {
-	token := c.Query("token")
-	//解析token
-	userId, err := util.ParseToken(token)
-	if err != nil { //ParseToken只会返回两种错误
-		if errors.Is(err, util.ErrNoAuth) {
-			log.Println("CommentHandler Token <nil>")
-			util.MakeResponse(c, &util.HttpResponse{
-				StatusCode: util.NoAuth,
-			})
-			return
-		}
-		if errors.Is(err, util.ErrWrongAuth) {
-			log.Println("CommentHandler Token Wrong Err=")
-			util.MakeResponse(c, &util.HttpResponse{
-				StatusCode: util.WrongAuth,
-			})
-			return
-		}
-	}
+	//获取从JWTMiddleware解析好的userId
+	v, _ := c.Get("userId")
+	userId := v.(int64)
 
 	actionType := c.Query("action_type")
 	//根据actionType做功能的拆分
@@ -174,7 +158,7 @@ func CommentListHandler(c *gin.Context) {
 			return
 		}
 		if errors.Is(err, util.ErrWrongAuth) {
-			log.Println("CommentHandler Token Wrong")
+			log.Println("CommentHandler Token Wrong,Err=", err)
 			util.MakeResponse(c, &util.HttpResponse{
 				StatusCode: util.WrongAuth,
 			})

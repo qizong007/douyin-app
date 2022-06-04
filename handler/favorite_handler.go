@@ -19,25 +19,9 @@ import (
 		1) delete_time = now()
 */
 func VideoFavoriteHandler(c *gin.Context) {
-	//token
-	token := c.Query("token")
-	if token == "" {
-		log.Println("VideoFavoriteHandler Token <nil>")
-		util.MakeResponse(c, &util.HttpResponse{
-			StatusCode: util.WrongAuth,
-		})
-		return
-	}
-
-	//userId
-	userId, err := util.ParseToken(token)
-	if err != nil {
-		log.Println("VideoFavoriteHandler ParseToken Failed", err)
-		util.MakeResponse(c, &util.HttpResponse{
-			StatusCode: util.WrongAuth,
-		})
-		return
-	}
+	//获取从JWTMiddleware解析好的userId
+	v, _ := c.Get("userId")
+	userId := v.(int64)
 
 	//videoId
 	vid, err := util.Str2Int64(c.Query("video_id"))
@@ -80,18 +64,9 @@ func VedioFavoriteListHandler(c *gin.Context) {
 		videoDOs []*domain.VideoDO
 	)
 
-	//token
-	token := c.Query("token")
-	if token != "" {
-		userId, err = util.ParseToken(token)
-		if err != nil {
-			log.Println("VedioFavoriteListHandler ParseToken Failed", err)
-			util.MakeResponse(c, &util.HttpResponse{
-				StatusCode: util.WrongAuth,
-			})
-			return
-		}
-	}
+	//获取从JWTMiddleware解析好的userId
+	v, _ := c.Get("userId")
+	userId = v.(int64)
 
 	//favoriteList
 	videoDOs, err = service.GetFavoriteList(c, userId)

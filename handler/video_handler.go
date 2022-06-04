@@ -16,29 +16,15 @@ const (
 )
 
 func VideoPublishHandler(c *gin.Context) {
-	token := c.PostForm("token")
-	if token == "" {
-		log.Println("VideoPublishHandler Token <nil>")
-		util.MakeResponse(c, &util.HttpResponse{
-			StatusCode: util.ParamError,
-		})
-		return
-	}
+	//获取从JWTMiddleware解析好的userId
+	v, _ := c.Get("userId")
+	userId := v.(int64)
 
 	title := c.PostForm("title")
 	if title == "" {
 		log.Println("VideoPublishHandler Title <nil>")
 		util.MakeResponse(c, &util.HttpResponse{
 			StatusCode: util.ParamError,
-		})
-		return
-	}
-
-	userId, err := util.ParseToken(token)
-	if err != nil {
-		log.Println("VideoPublishHandler ParseToken Failed", err)
-		util.MakeResponse(c, &util.HttpResponse{
-			StatusCode: util.WrongAuth,
 		})
 		return
 	}
@@ -97,23 +83,9 @@ func VideoPublishHandler(c *gin.Context) {
 }
 
 func VideoPublishedListHandler(c *gin.Context) {
-	token := c.Query("token")
-	if token == "" {
-		log.Println("VideoPublishedListHandler Token <nil>")
-		util.MakeResponse(c, &util.HttpResponse{
-			StatusCode: util.ParamError,
-		})
-		return
-	}
-
-	loginUserId, err := util.ParseToken(token)
-	if err != nil {
-		log.Println("VideoPublishedListHandler ParseToken Failed", err)
-		util.MakeResponse(c, &util.HttpResponse{
-			StatusCode: util.WrongAuth,
-		})
-		return
-	}
+	//获取从JWTMiddleware解析好的userId
+	v, _ := c.Get("userId")
+	loginUserId := v.(int64)
 
 	userIdStr := c.Query("user_id")
 	userId, err := util.Str2Int64(userIdStr)
@@ -159,19 +131,11 @@ func VideoFeedHandler(c *gin.Context) {
 		videoList []*repository.Video
 	)
 
-	token := c.Query("token")
 	latestTimeStr := c.Query("latest_time")
 
-	if token != "" {
-		userId, err = util.ParseToken(token)
-		if err != nil {
-			log.Println("VideoPublishHandler ParseToken Failed", err)
-			util.MakeResponse(c, &util.HttpResponse{
-				StatusCode: util.WrongAuth,
-			})
-			return
-		}
-	}
+	//获取从JWTMiddleware解析好的userId
+	v, _ := c.Get("userId")
+	userId = v.(int64)
 
 	if latestTimeStr == "" { // 没有传入 latest_time
 		videoList, err = repository.GetVideoRepository().FindWithLimit(c, FeedLimit)

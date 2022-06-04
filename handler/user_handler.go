@@ -98,23 +98,9 @@ func LoginHandler(c *gin.Context) {
 }
 
 func GetUserInfoHandler(c *gin.Context) {
-	token := c.Query("token")
-	if token == "" {
-		log.Println("GetUserInfoHandler Token <nil>")
-		util.MakeResponse(c, &util.HttpResponse{
-			StatusCode: util.ParamError,
-		})
-		return
-	}
-
-	loginUserId, err := util.ParseToken(token)
-	if err != nil {
-		log.Println("GetUserInfoHandler ParseToken Failed", err)
-		util.MakeResponse(c, &util.HttpResponse{
-			StatusCode: util.WrongAuth,
-		})
-		return
-	}
+	//获取从JWTMiddleware解析好的userId
+	v, _ := c.Get("userId")
+	loginUserId := v.(int64)
 
 	userIdStr := c.Query("user_id")
 	userId, err := util.Str2Int64(userIdStr)
