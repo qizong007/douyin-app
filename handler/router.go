@@ -15,6 +15,9 @@ func Register(r *gin.Engine) {
 	// feed
 	r.GET("/douyin/feed/", VideoFeedHandler)
 
+	// publish
+	r.POST("/douyin/publish/action/", VideoPublishHandler)
+
 	// commentList
 	r.GET("/douyin/comment/list/", CommentListHandler)
 
@@ -24,7 +27,6 @@ func Register(r *gin.Engine) {
 		r.GET("/douyin/user/", GetUserInfoHandler)
 
 		// video
-		r.POST("/douyin/publish/action/", VideoPublishHandler)
 		r.GET("/douyin/publish/list/", VideoPublishedListHandler)
 
 		// favorite

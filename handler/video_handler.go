@@ -18,14 +18,24 @@ const (
 )
 
 func VideoPublishHandler(c *gin.Context) {
-	//获取从JWTMiddleware解析好的userId
-	userId, err := middleware.GetUserId(c)
-	if err != nil {
-		log.Println(err)
-		util.MakeResponse(c, &util.HttpResponse{
-			StatusCode: util.InternalServerError,
-		})
-		return
+	token := c.PostForm("token")
+
+	userId, err := util.ParseToken(token)
+	if err != nil { //ParseToken只会返回两种错误
+		if errors.Is(err, util.ErrNoAuth) {
+			log.Println("VideoPublishHandler Token <Nil>")
+			util.MakeResponse(c, &util.HttpResponse{
+				StatusCode: util.NoAuth,
+			})
+			return
+		}
+		if errors.Is(err, util.ErrWrongAuth) {
+			log.Println("VideoPublishHandler Token Wrong ,Err=", err)
+			util.MakeResponse(c, &util.HttpResponse{
+				StatusCode: util.WrongAuth,
+			})
+			return
+		}
 	}
 
 	title := c.PostForm("title")
