@@ -29,8 +29,8 @@ const (
 
 var ErrCode2Msg = map[int]string{
 	Success:             "请求成功",
-	WrongAuth:           "用户登录已过期（失效）",
-	NoAuth:              "权限不足",
+	WrongAuth:           "用户登录已过期,请重新登陆",
+	NoAuth:              "权限不足,请登录后查看哦",
 	UserExisted:         "用户名已存在",
 	UserNotExist:        "用户不存在",
 	WrongPassword:       "密码错误",
