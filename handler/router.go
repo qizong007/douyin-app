@@ -11,8 +11,12 @@ func Register(r *gin.Engine) {
 	// user
 	r.POST("/douyin/user/register/", RegisterHandler)
 	r.POST("/douyin/user/login/", LoginHandler)
+
 	// feed
 	r.GET("/douyin/feed/", VideoFeedHandler)
+
+	// commentList
+	r.GET("/douyin/comment/list/", CommentListHandler)
 
 	r.Use(middleware.JWT)
 	{
@@ -34,7 +38,6 @@ func Register(r *gin.Engine) {
 
 		// comment
 		r.POST("/douyin/comment/action/", CommentHandler)
-		r.GET("/douyin/comment/list/", CommentListHandler)
 	}
 
 }
