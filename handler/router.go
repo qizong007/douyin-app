@@ -8,15 +8,16 @@ import (
 func Register(r *gin.Engine) {
 	r.GET("ping", Ping)
 
-	r.GET("/douyin/user/", GetUserInfoHandler)
-
+	// user
+	r.POST("/douyin/user/register/", RegisterHandler)
+	r.POST("/douyin/user/login/", LoginHandler)
+	// feed
 	r.GET("/douyin/feed/", VideoFeedHandler)
 
 	r.Use(middleware.JWT)
 	{
-		// user
-		r.POST("/douyin/user/register/", RegisterHandler)
-		r.POST("/douyin/user/login/", LoginHandler)
+		//userInfo
+		r.GET("/douyin/user/", GetUserInfoHandler)
 
 		// video
 		r.POST("/douyin/publish/action/", VideoPublishHandler)
