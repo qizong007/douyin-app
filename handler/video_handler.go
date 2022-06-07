@@ -6,6 +6,7 @@ import (
 	"douyin-app/repository"
 	"douyin-app/service"
 	"douyin-app/util"
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
@@ -17,14 +18,24 @@ const (
 )
 
 func VideoPublishHandler(c *gin.Context) {
-	//获取从JWTMiddleware解析好的userId
-	userId, err := middleware.GetUserId(c)
-	if err != nil {
-		log.Println(err)
-		util.MakeResponse(c, &util.HttpResponse{
-			StatusCode: util.InternalServerError,
-		})
-		return
+	token := c.PostForm("token")
+
+	userId, err := util.ParseToken(token)
+	if err != nil { //ParseToken只会返回两种错误
+		if errors.Is(err, util.ErrNoAuth) {
+			log.Println("VideoPublishHandler Token <Nil>")
+			util.MakeResponse(c, &util.HttpResponse{
+				StatusCode: util.NoAuth,
+			})
+			return
+		}
+		if errors.Is(err, util.ErrWrongAuth) {
+			log.Println("VideoPublishHandler Token Wrong ,Err=", err)
+			util.MakeResponse(c, &util.HttpResponse{
+				StatusCode: util.WrongAuth,
+			})
+			return
+		}
 	}
 
 	title := c.PostForm("title")
@@ -145,15 +156,17 @@ func VideoFeedHandler(c *gin.Context) {
 	)
 
 	latestTimeStr := c.Query("latest_time")
+	token := c.Query("token")
 
-	//获取从JWTMiddleware解析好的userId
-	userId, err = middleware.GetUserId(c)
+	//解析token,这里允许token为空的未登录用户刷视频,忽略了NoAuth错误
+	userId, err = util.ParseToken(token)
 	if err != nil {
-		log.Println(err)
-		util.MakeResponse(c, &util.HttpResponse{
-			StatusCode: util.InternalServerError,
-		})
-		return
+		if errors.Is(err, util.ErrWrongAuth) { //token不为空,但是解析出错,这里会提醒用户重新登陆
+			log.Println("JWTMiddleWare Token Wrong ,Err=", err)
+			util.MakeResponse(c, &util.HttpResponse{
+				StatusCode: util.WrongAuth,
+			})
+		}
 	}
 
 	if latestTimeStr == "" { // 没有传入 latest_time

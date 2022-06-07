@@ -11,8 +11,15 @@ func Register(r *gin.Engine) {
 	// user
 	r.POST("/douyin/user/register/", RegisterHandler)
 	r.POST("/douyin/user/login/", LoginHandler)
+
 	// feed
 	r.GET("/douyin/feed/", VideoFeedHandler)
+
+	// publish
+	r.POST("/douyin/publish/action/", VideoPublishHandler)
+
+	// commentList
+	r.GET("/douyin/comment/list/", CommentListHandler)
 
 	r.Use(middleware.JWT)
 	{
@@ -20,7 +27,6 @@ func Register(r *gin.Engine) {
 		r.GET("/douyin/user/", GetUserInfoHandler)
 
 		// video
-		r.POST("/douyin/publish/action/", VideoPublishHandler)
 		r.GET("/douyin/publish/list/", VideoPublishedListHandler)
 
 		// favorite
@@ -34,7 +40,6 @@ func Register(r *gin.Engine) {
 
 		// comment
 		r.POST("/douyin/comment/action/", CommentHandler)
-		r.GET("/douyin/comment/list/", CommentListHandler)
 	}
 
 }

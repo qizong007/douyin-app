@@ -153,15 +153,19 @@ func DeleteCommentHandler(c *gin.Context) {
 }
 
 func CommentListHandler(c *gin.Context) {
-	//获取从JWTMiddleware解析好的userId
-	userId, err := middleware.GetUserId(c)
+	token := c.Query("token")
+
+	//解析token,这里允许token为空的未登录用户刷视频,忽略了NoAuth错误
+	userId, err := util.ParseToken(token)
 	if err != nil {
-		log.Println(err)
-		util.MakeResponse(c, &util.HttpResponse{
-			StatusCode: util.InternalServerError,
-		})
-		return
+		if errors.Is(err, util.ErrWrongAuth) { //token不为空,但是解析出错,这里会提醒用户重新登陆
+			log.Println("JWTMiddleWare Token Wrong ,Err=", err)
+			util.MakeResponse(c, &util.HttpResponse{
+				StatusCode: util.WrongAuth,
+			})
+		}
 	}
+
 	reqVideoId := c.Query("video_id")
 	videoId, err := util.Str2Int64(reqVideoId)
 	if err != nil {
